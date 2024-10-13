@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexLiber Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 10px; }
+        input, button { margin: 5px 0; padding: 5px; }
+    </style>
+</head>
+<body>
+    <h1>LexLiber Demo</h1>
+    <h2>Book List</h2>
+    <ul id="bookList">
+        <li>To Kill a Mockingbird by Harper Lee</li>
+        <li>1984 by George Orwell</li>
+    </ul>
+    <h2>Add New Book</h2>
+    <input type="text" id="title" placeholder="Title">
+    <input type="text" id="author" placeholder="Author">
+    <button onclick="addBook()">Add Book</button>
+
+    <script>
+        function addBook() {
+            var title = document.getElementById('title').value;
+            var author = document.getElementById('author').value;
+            if (title && author) {
+                var li = document.createElement('li');
+                li.textContent = title + ' by ' + author;
+                document.getElementById('bookList').appendChild(li);
+                document.getElementById('title').value = '';
+                document.getElementById('author').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
