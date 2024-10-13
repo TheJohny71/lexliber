@@ -1,80 +1,135 @@
-<index.html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexLiber - Your Personal Library</title>
+    <title>LexLiber - Law Firm Book Catalog</title>
+    <!-- Add Euclid Flex B and Stanley fonts here. You may need to license these fonts or use a web font service. -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --primary-green: #00a68e;
+            --charcoal: #000000;
+            --gray-1: #f7f7f7;
+            --white: #ffffff;
+            --black: #000000;
+            --violet: #7379b9;
+            --coral: #f27557;
+            --blue: #278bcb;
+            --gray-2: #c7c7c7;
+            --chartreuse: #cad23b;
+        }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Euclid Flex B', sans-serif;
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: var(--gray-1);
+            color: var(--charcoal);
         }
         header {
-            background-color: #35424a;
-            color: white;
+            background-color: var(--primary-green);
+            color: var(--white);
             text-align: center;
             padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            font-family: 'Stanley', serif;
         }
         main {
             padding: 2rem;
-            max-width: 800px;
+            max-width: 1200px;
             margin: auto;
         }
-        h1 {
-            margin-bottom: 0;
+        #search-form, #book-list {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
         }
-        #book-form {
-            background-color: white;
-            padding: 1rem;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        #book-form h2 {
+        #search-form h2, #book-list h2 {
+            color: var(--primary-green);
             margin-top: 0;
         }
-        #book-form input[type="text"],
-        #book-form input[type="submit"] {
+        input[type="text"], select, input[type="submit"] {
             width: 100%;
-            padding: 0.5rem;
+            padding: 0.8rem;
             margin-bottom: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 3px;
+            border: 1px solid var(--gray-2);
+            border-radius: 4px;
+            font-size: 1rem;
         }
-        #book-form input[type="submit"] {
-            background-color: #35424a;
-            color: white;
+        input[type="submit"] {
+            background-color: var(--primary-green);
+            color: var(--white);
             border: none;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
-        #book-form input[type="submit"]:hover {
-            background-color: #2c3840;
+        input[type="submit"]:hover {
+            background-color: var(--blue);
         }
-        #book-list {
+        .book-item {
+            border-bottom: 1px solid var(--gray-2);
+            padding: 1rem 0;
+        }
+        .book-item:last-child {
+            border-bottom: none;
+        }
+        .book-title {
+            font-weight: 600;
+            color: var(--primary-green);
+        }
+        .book-details {
+            color: var(--charcoal);
+        }
+        #admin-link {
+            text-align: center;
             margin-top: 2rem;
+        }
+        #admin-link a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+        #admin-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>LexLiber</h1>
-        <p>Your Personal Library Manager</p>
+        <h1><img src="path_to_lexliber_logo.png" alt="LexLiber Logo"> LexLiber</h1>
+        <p>Law Firm Book Catalog</p>
     </header>
     <main>
-        <section id="book-form">
-            <h2>Add a New Book</h2>
-            <form>
-                <input type="text" id="title" placeholder="Book Title" required>
-                <input type="text" id="author" placeholder="Author" required>
-                <input type="submit" value="Add Book">
+        <section id="search-form">
+            <h2><i class="fas fa-search"></i> Search Books</h2>
+            <form id="book-search-form">
+                <input type="text" id="search-input" placeholder="Search by title, call number, author, or keyword" required>
+                <select id="practice-area">
+                    <option value="">Select Practice Area</option>
+                    <!-- Add practice area options here -->
+                </select>
+                <select id="publication-year">
+                    <option value="">Select Publication Year</option>
+                    <!-- Add year options here -->
+                </select>
+                <select id="item-status">
+                    <option value="">Select Item Status</option>
+                    <!-- Add status options here -->
+                </select>
+                <input type="submit" value="Search">
             </form>
         </section>
         <section id="book-list">
-            <h2>Your Books</h2>
+            <h2><i class="fas fa-book"></i> Search Results</h2>
             <!-- Books will be dynamically added here with JavaScript -->
         </section>
+        <div id="admin-link">
+            <a href="admin.html">Admin Portal</a>
+        </div>
     </main>
     <script>
         // We'll add JavaScript here in the next step
