@@ -3,38 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexLiber Demo</title>
+    <title>LexLiber - Your Personal Library</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        ul { list-style-type: none; padding: 0; }
-        li { margin-bottom: 10px; }
-        input, button { margin: 5px 0; padding: 5px; }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #35424a;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+        main {
+            padding: 2rem;
+            max-width: 800px;
+            margin: auto;
+        }
+        h1 {
+            margin-bottom: 0;
+        }
+        #book-form {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        #book-form h2 {
+            margin-top: 0;
+        }
+        #book-form input[type="text"],
+        #book-form input[type="submit"] {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        #book-form input[type="submit"] {
+            background-color: #35424a;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #book-form input[type="submit"]:hover {
+            background-color: #2c3840;
+        }
+        #book-list {
+            margin-top: 2rem;
+        }
     </style>
 </head>
 <body>
-    <h1>LexLiber Demo</h1>
-    <h2>Book List</h2>
-    <ul id="bookList">
-        <li>To Kill a Mockingbird by Harper Lee</li>
-        <li>1984 by George Orwell</li>
-    </ul>
-    <h2>Add New Book</h2>
-    <input type="text" id="title" placeholder="Title">
-    <input type="text" id="author" placeholder="Author">
-    <button onclick="addBook()">Add Book</button>
-
+    <header>
+        <h1>LexLiber</h1>
+        <p>Your Personal Library Manager</p>
+    </header>
+    <main>
+        <section id="book-form">
+            <h2>Add a New Book</h2>
+            <form>
+                <input type="text" id="title" placeholder="Book Title" required>
+                <input type="text" id="author" placeholder="Author" required>
+                <input type="submit" value="Add Book">
+            </form>
+        </section>
+        <section id="book-list">
+            <h2>Your Books</h2>
+            <!-- Books will be dynamically added here with JavaScript -->
+        </section>
+    </main>
     <script>
-        function addBook() {
-            var title = document.getElementById('title').value;
-            var author = document.getElementById('author').value;
-            if (title && author) {
-                var li = document.createElement('li');
-                li.textContent = title + ' by ' + author;
-                document.getElementById('bookList').appendChild(li);
-                document.getElementById('title').value = '';
-                document.getElementById('author').value = '';
-            }
-        }
+        // We'll add JavaScript here in the next step
     </script>
 </body>
 </html>
