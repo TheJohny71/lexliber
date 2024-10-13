@@ -30,9 +30,17 @@
         header {
             background-color: var(--primary-green);
             color: var(--white);
-            text-align: center;
-            padding: 1rem;
+            text-align: left;
+            padding: 1rem 2rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+        header p {
+            margin: 0.5rem 0 0;
         }
         h1, h2 {
             font-family: 'Stanley', serif;
@@ -100,7 +108,7 @@
 </head>
 <body>
     <header>
-        <h1><img src="path_to_lexliber_logo.png" alt="LexLiber Logo"> LexLiber</h1>
+        <h1><img src="lexliber-logo.png" alt="LexLiber Logo" style="height: 40px; vertical-align: middle;"> LexLiber</h1>
         <p>Law Firm Book Catalog</p>
     </header>
     <main>
@@ -118,21 +126,4 @@
                 </select>
                 <select id="item-status">
                     <option value="">Select Item Status</option>
-                    <!-- Add status options here -->
-                </select>
-                <input type="submit" value="Search">
-            </form>
-        </section>
-        <section id="book-list">
-            <h2><i class="fas fa-book"></i> Search Results</h2>
-            <!-- Books will be dynamically added here with JavaScript -->
-        </section>
-        <div id="admin-link">
-            <a href="admin.html">Admin Portal</a>
-        </div>
-    </main>
-    <script>
-        // We'll add JavaScript here in the next step
-    </script>
-</body>
-</html>
+                    <!-- Add status options
