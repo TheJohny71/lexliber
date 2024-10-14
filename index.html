@@ -10,9 +10,6 @@
             background-color: #f0f0f0;
             margin: 0;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
         .container {
             background-color: white;
@@ -20,7 +17,7 @@
             padding: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             max-width: 800px;
-            width: 100%;
+            margin: 0 auto;
         }
         h1 {
             color: #333;
@@ -45,27 +42,29 @@
             color: #2c3e50;
         }
         .logo {
+            display: block;
             max-width: 200px;
-            margin-bottom: 20px;
+            margin: 0 auto 20px;
         }
     </style>
 </head>
 <body>
-    <img src="lexliber-logo.png.jpg" alt="LexLiber Logo" class="logo">
     <div class="container">
+        <img src="lexliber-logo.png.jpg" alt="LexLiber Logo" class="logo">
         <h1>LexLiber Catalog</h1>
         <input type="text" id="searchInput" placeholder="Search books...">
         <div id="results"></div>
     </div>
 
     <script>
+        console.log("Script is running");
         let books = [];
 
         async function loadBooks() {
             try {
                 const response = await fetch('Sheet1.json');
                 books = await response.json();
-                console.log('Books loaded:', books.length);
+                console.log('Books loaded:', books);
                 displayBooks(books);
             } catch (error) {
                 console.error('Error loading books:', error);
@@ -73,8 +72,14 @@
         }
 
         function displayBooks(booksToShow) {
+            console.log('Displaying books:', booksToShow);
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '';
+
+            if (booksToShow.length === 0) {
+                resultsDiv.innerHTML = '<p>No books found</p>';
+                return;
+            }
 
             booksToShow.forEach(book => {
                 const bookElement = document.createElement('div');
