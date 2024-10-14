@@ -34,17 +34,34 @@
             --secondary-blue: #278bcb;
             --secondary-gray: #c7c7c7;
             --secondary-chartreuse: #cad23b;
+            --font-size-small: 14px;
+            --font-size-medium: 16px;
+            --font-size-large: 18px;
+            --spacing-small: 8px;
+            --spacing-medium: 16px;
+            --spacing-large: 24px;
+            --border-radius: 4px;
+            --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         body {
             font-family: 'Euclid Flex B', Arial, sans-serif;
+            font-size: var(--font-size-medium);
             line-height: 1.6;
             color: var(--primary-charcoal);
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
             background-color: var(--primary-gray);
+            margin: 0;
+            padding: 0;
         }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-medium);
+        }
+
         .hidden { display: none; }
+
         .gear-icon { 
             cursor: pointer;
             font-size: 24px;
@@ -53,29 +70,48 @@
             top: 20px;
             right: 20px;
         }
+
         h1, h2, h3 {
             font-family: 'Stanley', serif;
             color: var(--primary-green);
         }
+
         h1 {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: var(--spacing-large);
+            font-size: 2.5em;
         }
-        form { 
-            margin-top: 20px;
+
+        .card {
             background-color: var(--primary-white);
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: var(--spacing-medium);
+            margin-bottom: var(--spacing-medium);
+            transition: box-shadow 0.3s ease;
         }
-        input, button, select { 
-            margin: 10px 0;
-            display: block;
-            width: 100%;
-            padding: 10px;
+
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        input, select, button { 
+            font-size: var(--font-size-medium);
+            padding: var(--spacing-small) var(--spacing-medium);
             border: 1px solid var(--secondary-gray);
-            border-radius: 4px;
+            border-radius: var(--border-radius);
+            margin: var(--spacing-small) 0;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
         }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 2px rgba(0, 166, 142, 0.2);
+        }
+
         button {
             background-color: var(--primary-green);
             color: var(--primary-white);
@@ -83,9 +119,21 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
+
         button:hover {
             background-color: var(--secondary-blue);
         }
+
+        .button-secondary {
+            background-color: var(--secondary-gray);
+            color: var(--primary-charcoal);
+        }
+
+        .button-secondary:hover {
+            background-color: var(--secondary-violet);
+            color: var(--primary-white);
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -97,16 +145,18 @@
             overflow: auto;
             background-color: rgba(0,0,0,0.4);
         }
+
         .modal-content {
             background-color: var(--primary-white);
             margin: 15% auto;
-            padding: 20px;
+            padding: var(--spacing-large);
             border: 1px solid var(--secondary-gray);
             width: 80%;
             max-width: 500px;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
         }
+
         .close {
             color: var(--secondary-gray);
             float: right;
@@ -114,122 +164,154 @@
             font-weight: bold;
             cursor: pointer;
         }
+
         .close:hover {
             color: var(--primary-charcoal);
         }
+
         #userResults, #adminResults {
-            margin-top: 20px;
+            margin-top: var(--spacing-large);
         }
+
         .book-item {
             background-color: var(--primary-white);
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: var(--spacing-medium);
+            margin-bottom: var(--spacing-medium);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
         }
+
         .book-item h3 {
             margin-top: 0;
             color: var(--primary-green);
         }
+
         .book-item p {
-            margin: 5px 0;
+            margin: var(--spacing-small) 0;
         }
+
         .book-item button {
             display: inline-block;
             width: auto;
-            margin-right: 10px;
-            margin-top: 10px;
+            margin-right: var(--spacing-small);
+            margin-top: var(--spacing-small);
         }
+
         #uploadFeedback {
-            margin-top: 10px;
-            padding: 10px;
+            margin-top: var(--spacing-medium);
+            padding: var(--spacing-medium);
             background-color: var(--secondary-chartreuse);
-            border-radius: 4px;
+            border-radius: var(--border-radius);
         }
+
         .filter-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: var(--spacing-small);
+            margin-bottom: var(--spacing-medium);
         }
+
         .filter-container select {
             flex: 1;
             min-width: 150px;
         }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--spacing-small);
+            }
+            
+            input, select, button {
+                width: 100%;
+                margin-bottom: var(--spacing-small);
+            }
+
+            .filter-container {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>LexLiber</h1>
-    <i class="fas fa-cog gear-icon" id="adminIcon"></i>
-    
-    <div id="userInterface">
-        <div class="filter-container">
-            <select id="userSearchField">
-                <option value="all">Search By</option>
-                <option value="Title">Title</option>
-                <option value="Author">Author</option>
-                <option value="Call Number">Call Number</option>
-                <option value="Practice Area">Practice Area</option>
-            </select>
-            <select id="practiceAreaFilter">
-                <option value="">All Practice Areas</option>
-                <!-- Add practice area options dynamically -->
-            </select>
-            <select id="publicationYearFilter">
-                <option value="">All Years</option>
-                <!-- Add year options dynamically -->
-            </select>
-            <select id="itemStatusFilter">
-                <option value="">Status</option>
-                <option value="Available">Available</option>
-                <option value="Checked Out">Checked Out</option>
-            </select>
+    <div class="container">
+        <h1>LexLiber</h1>
+        <i class="fas fa-cog gear-icon" id="adminIcon"></i>
+        
+        <div id="userInterface" class="card">
+            <div class="filter-container">
+                <select id="userSearchField">
+                    <option value="all">Search By</option>
+                    <option value="Title">Title</option>
+                    <option value="Author">Author</option>
+                    <option value="Call Number">Call Number</option>
+                    <option value="Practice Area">Practice Area</option>
+                </select>
+                <select id="practiceAreaFilter">
+                    <option value="">Practice Areas</option>
+                    <!-- Add practice area options dynamically -->
+                </select>
+                <select id="publicationYearFilter">
+                    <option value="">Years</option>
+                    <!-- Add year options dynamically -->
+                </select>
+                <select id="itemStatusFilter">
+                    <option value="">Status</option>
+                    <option value="Available">Available</option>
+                    <option value="Checked Out">Checked Out</option>
+                </select>
+            </div>
+            <input type="text" id="userSearchInput" placeholder="Enter search term...">
+            <button id="userSearchButton">Search</button>
+            <div id="userResults"></div>
         </div>
-        <input type="text" id="userSearchInput" placeholder="Enter search term...">
-        <button id="userSearchButton">Search</button>
-        <div id="userResults"></div>
-    </div>
 
-    <div id="adminInterface" class="hidden">
-        <h2>Admin Interface</h2>
-        <form id="addBookForm">
-            <h3>Add New Book</h3>
-            <input type="text" id="titleInput" placeholder="Title" required>
-            <input type="text" id="authorInput" placeholder="Author" required>
-            <input type="text" id="callNumberInput" placeholder="Call Number" required>
-            <input type="text" id="locationInput" placeholder="Collection Location" required>
-            <input type="text" id="statusInput" placeholder="Item Status" required>
-            <input type="text" id="practiceAreaInput" placeholder="Practice Area" required>
-            <input type="text" id="publicationYearInput" placeholder="Publication Year" required>
-            <input type="text" id="copyInput" placeholder="Copy" required>
-            <button type="submit">Add Book</button>
-        </form>
-        <h3>Bulk Upload</h3>
-        <input type="file" id="bulkUploadInput" accept=".xlsx,.xls,.csv">
-        <button id="bulkUploadButton">Upload File</button>
-        <div id="uploadFeedback"></div>
-        <h3>Manage Books</h3>
-        <button id="exportButton">Export Catalog</button>
-        <input type="text" id="adminSearchInput" placeholder="Search books...">
-        <button id="adminSearchButton">Search</button>
-        <div id="adminResults"></div>
-    </div>
+        <div id="adminInterface" class="hidden">
+            <div class="card">
+                <h2>Admin Interface</h2>
+                <form id="addBookForm">
+                    <h3>Add New Book</h3>
+                    <input type="text" id="titleInput" placeholder="Title" required>
+                    <input type="text" id="authorInput" placeholder="Author" required>
+                    <input type="text" id="callNumberInput" placeholder="Call Number" required>
+                    <input type="text" id="locationInput" placeholder="Collection Location" required>
+                    <input type="text" id="statusInput" placeholder="Item Status" required>
+                    <input type="text" id="practiceAreaInput" placeholder="Practice Area" required>
+                    <input type="text" id="publicationYearInput" placeholder="Publication Year" required>
+                    <input type="text" id="copyInput" placeholder="Copy" required>
+                    <button type="submit">Add Book</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Bulk Upload</h3>
+                <input type="file" id="bulkUploadInput" accept=".xlsx,.xls,.csv">
+                <button id="bulkUploadButton">Upload File</button>
+                <div id="uploadFeedback"></div>
+            </div>
+            <div class="card">
+                <h3>Manage Books</h3>
+                <button id="exportButton" class="button-secondary">Export Catalog</button>
+                <input type="text" id="adminSearchInput" placeholder="Search books...">
+                <button id="adminSearchButton">Search</button>
+                <div id="adminResults"></div>
+            </div>
+        </div>
 
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Edit Book</h2>
-            <form id="editBookForm">
-                <input type="text" id="editTitleInput" placeholder="Title" required>
-                <input type="text" id="editAuthorInput" placeholder="Author" required>
-                <input type="text" id="editCallNumberInput" placeholder="Call Number" required>
-                <input type="text" id="editLocationInput" placeholder="Collection Location" required>
-                <input type="text" id="editStatusInput" placeholder="Item Status" required>
-                <input type="text" id="editPracticeAreaInput" placeholder="Practice Area" required>
-                <input type="text" id="editPublicationYearInput" placeholder="Publication Year" required>
-                <input type="text" id="editCopyInput" placeholder="Copy" required>
-                <button type="submit">Save Changes</button>
-            </form>
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Edit Book</h2>
+                <form id="editBookForm">
+                    <input type="text" id="editTitleInput" placeholder="Title" required>
+                    <input type="text" id="editAuthorInput" placeholder="Author" required>
+                    <input type="text" id="editCallNumberInput" placeholder="Call Number" required>
+                    <input type="text" id="editLocationInput" placeholder="Collection Location" required>
+                    <input type="text" id="editStatusInput" placeholder="Item Status" required>
+                    <input type="text" id="editPracticeAreaInput" placeholder="Practice Area" required>
+                    <input type="text" id="editPublicationYearInput" placeholder="Publication Year" required>
+                    <input type="text" id="editCopyInput" placeholder="Copy" required>
+                    <button type="submit">Save Changes</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -333,15 +415,6 @@
         updateFilterOptions();
     }
 
-    function deleteBook(index) {
-        if (confirm("Are you sure you want to delete this book?")) {
-            books.splice(index, 1);
-            alert("Book deleted successfully!");
-            searchBooks(true); // Refresh the admin book list
-            updateFilterOptions();
-        }
-    }
-
     function editBook(index) {
         editingIndex = index;
         const book = books[index];
@@ -354,6 +427,14 @@
         document.getElementById("editPublicationYearInput").value = book["Publication Year"];
         document.getElementById("editCopyInput").value = book["Copy"];
         document.getElementById("editModal").style.display = "block";
+    }
+
+    function deleteBook(index) {
+        if (confirm("Are you sure you want to delete this book?")) {
+            books.splice(index, 1);
+            searchBooks(true); // Refresh the admin book list
+            updateFilterOptions();
+        }
     }
 
     function saveEditedBook(event) {
@@ -434,8 +515,8 @@
         const practiceAreaFilter = document.getElementById("practiceAreaFilter");
         const publicationYearFilter = document.getElementById("publicationYearFilter");
 
-        practiceAreaFilter.innerHTML = '<option value="">All Practice Areas</option>';
-        publicationYearFilter.innerHTML = '<option value="">All Years</option>';
+        practiceAreaFilter.innerHTML = '<option value="">Practice Areas</option>';
+        publicationYearFilter.innerHTML = '<option value="">Years</option>';
 
         practiceAreas.forEach(area => {
             practiceAreaFilter.innerHTML += `<option value="${area}">${area}</option>`;
