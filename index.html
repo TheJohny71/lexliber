@@ -7,56 +7,84 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <style>
+        @font-face {
+            font-family: 'Euclid Flex B';
+            src: url('path/to/EuclidFlexB-Regular.woff2') format('woff2'),
+                 url('path/to/EuclidFlexB-Regular.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Stanley';
+            src: url('path/to/Stanley-Regular.woff2') format('woff2'),
+                 url('path/to/Stanley-Regular.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --primary-green: #00a68e;
+            --primary-charcoal: #000000;
+            --primary-gray: #f7f7f7;
+            --primary-white: #ffffff;
+            --primary-black: #000000;
+            --secondary-violet: #7379b9;
+            --secondary-coral: #f27557;
+            --secondary-blue: #278bcb;
+            --secondary-gray: #c7c7c7;
+            --secondary-chartreuse: #cad23b;
+        }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Euclid Flex B', Arial, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: var(--primary-charcoal);
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f4f4f4;
+            background-color: var(--primary-gray);
         }
         .hidden { display: none; }
         .gear-icon { 
             cursor: pointer;
             font-size: 24px;
-            color: #007bff;
+            color: var(--primary-green);
             position: absolute;
             top: 20px;
             right: 20px;
         }
+        h1, h2, h3 {
+            font-family: 'Stanley', serif;
+            color: var(--primary-green);
+        }
         h1 {
-            color: #007bff;
             text-align: center;
             margin-bottom: 30px;
         }
-        h2, h3 {
-            color: #0056b3;
-        }
         form { 
             margin-top: 20px;
-            background-color: #fff;
+            background-color: var(--primary-white);
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        input, button { 
+        input, button, select { 
             margin: 10px 0;
             display: block;
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--secondary-gray);
             border-radius: 4px;
         }
         button {
-            background-color: #007bff;
-            color: #fff;
+            background-color: var(--primary-green);
+            color: var(--primary-white);
             border: none;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: var(--secondary-blue);
         }
         .modal {
             display: none;
@@ -70,30 +98,30 @@
             background-color: rgba(0,0,0,0.4);
         }
         .modal-content {
-            background-color: #fefefe;
+            background-color: var(--primary-white);
             margin: 15% auto;
             padding: 20px;
-            border: 1px solid #888;
+            border: 1px solid var(--secondary-gray);
             width: 80%;
             max-width: 500px;
             border-radius: 5px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .close {
-            color: #aaa;
+            color: var(--secondary-gray);
             float: right;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
         }
         .close:hover {
-            color: #000;
+            color: var(--primary-charcoal);
         }
         #userResults, #adminResults {
             margin-top: 20px;
         }
         .book-item {
-            background-color: #fff;
+            background-color: var(--primary-white);
             padding: 15px;
             margin-bottom: 15px;
             border-radius: 5px;
@@ -101,7 +129,7 @@
         }
         .book-item h3 {
             margin-top: 0;
-            color: #007bff;
+            color: var(--primary-green);
         }
         .book-item p {
             margin: 5px 0;
@@ -115,8 +143,18 @@
         #uploadFeedback {
             margin-top: 10px;
             padding: 10px;
-            background-color: #e9ecef;
+            background-color: var(--secondary-chartreuse);
             border-radius: 4px;
+        }
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-container select {
+            flex: 1;
+            min-width: 150px;
         }
     </style>
 </head>
@@ -125,6 +163,28 @@
     <i class="fas fa-cog gear-icon" id="adminIcon"></i>
     
     <div id="userInterface">
+        <div class="filter-container">
+            <select id="userSearchField">
+                <option value="all">All Fields</option>
+                <option value="Title">Title</option>
+                <option value="Author">Author</option>
+                <option value="Call Number">Call Number</option>
+                <option value="Practice Area">Practice Area</option>
+            </select>
+            <select id="practiceAreaFilter">
+                <option value="">All Practice Areas</option>
+                <!-- Add practice area options dynamically -->
+            </select>
+            <select id="publicationYearFilter">
+                <option value="">All Years</option>
+                <!-- Add year options dynamically -->
+            </select>
+            <select id="itemStatusFilter">
+                <option value="">All Statuses</option>
+                <option value="Available">Available</option>
+                <option value="Checked Out">Checked Out</option>
+            </select>
+        </div>
         <input type="text" id="userSearchInput" placeholder="Enter search term...">
         <button id="userSearchButton">Search</button>
         <div id="userResults"></div>
@@ -140,6 +200,8 @@
             <input type="text" id="locationInput" placeholder="Collection Location" required>
             <input type="text" id="statusInput" placeholder="Item Status" required>
             <input type="text" id="practiceAreaInput" placeholder="Practice Area" required>
+            <input type="text" id="publicationYearInput" placeholder="Publication Year" required>
+            <input type="text" id="copyInput" placeholder="Copy" required>
             <button type="submit">Add Book</button>
         </form>
         <h3>Bulk Upload</h3>
@@ -147,6 +209,7 @@
         <button id="bulkUploadButton">Upload File</button>
         <div id="uploadFeedback"></div>
         <h3>Manage Books</h3>
+        <button id="exportButton">Export Catalog</button>
         <input type="text" id="adminSearchInput" placeholder="Search books...">
         <button id="adminSearchButton">Search</button>
         <div id="adminResults"></div>
@@ -163,6 +226,8 @@
                 <input type="text" id="editLocationInput" placeholder="Collection Location" required>
                 <input type="text" id="editStatusInput" placeholder="Item Status" required>
                 <input type="text" id="editPracticeAreaInput" placeholder="Practice Area" required>
+                <input type="text" id="editPublicationYearInput" placeholder="Publication Year" required>
+                <input type="text" id="editCopyInput" placeholder="Copy" required>
                 <button type="submit">Save Changes</button>
             </form>
         </div>
@@ -172,9 +237,9 @@
     console.log("Script started");
 
     let books = [
-        { "Title": "Sample Book 1", "Author": "John Doe", "Call Number": "ABC123", "Collection Location": "Main Library", "Item Status": "Available", "Practice Area": "General Law" },
-        { "Title": "Sample Book 2", "Author": "Jane Smith", "Call Number": "XYZ789", "Collection Location": "Law Library", "Item Status": "Checked Out", "Practice Area": "Criminal Law" },
-        { "Title": "Contract", "Author": "JD", "Call Number": "123", "Collection Location": "stack", "Item Status": "checked out", "Practice Area": "transactions" }
+        { "Title": "Sample Book 1", "Author": "John Doe", "Call Number": "ABC123", "Collection Location": "Main Library", "Item Status": "Available", "Practice Area": "General Law", "Publication Year": "2020", "Copy": "1" },
+        { "Title": "Sample Book 2", "Author": "Jane Smith", "Call Number": "XYZ789", "Collection Location": "Law Library", "Item Status": "Checked Out", "Practice Area": "Criminal Law", "Publication Year": "2019", "Copy": "2" },
+        { "Title": "Contract Law Basics", "Author": "Alice Johnson", "Call Number": "CON456", "Collection Location": "Main Library", "Item Status": "Available", "Practice Area": "Contract Law", "Publication Year": "2021", "Copy": "1" }
     ];
 
     let editingIndex = -1;
@@ -184,14 +249,37 @@
         const searchTerm = isAdmin 
             ? document.getElementById("adminSearchInput").value.toLowerCase()
             : document.getElementById("userSearchInput").value.toLowerCase();
+        const searchField = isAdmin
+            ? document.getElementById("adminSearchField").value
+            : document.getElementById("userSearchField").value;
         const resultsDiv = isAdmin ? document.getElementById("adminResults") : document.getElementById("userResults");
         resultsDiv.innerHTML = "";
 
-        const filteredBooks = books.filter(book => 
-            Object.values(book).some(value => 
-                String(value).toLowerCase().includes(searchTerm)
-            )
-        );
+        let filteredBooks = books;
+
+        // Apply filters
+        if (!isAdmin) {
+            const practiceArea = document.getElementById("practiceAreaFilter").value;
+            const publicationYear = document.getElementById("publicationYearFilter").value;
+            const itemStatus = document.getElementById("itemStatusFilter").value;
+
+            filteredBooks = filteredBooks.filter(book => 
+                (practiceArea === "" || book["Practice Area"] === practiceArea) &&
+                (publicationYear === "" || book["Publication Year"] === publicationYear) &&
+                (itemStatus === "" || book["Item Status"] === itemStatus)
+            );
+        }
+
+        // Apply search
+        filteredBooks = filteredBooks.filter(book => {
+            if (searchField === "all") {
+                return Object.values(book).some(value => 
+                    String(value).toLowerCase().includes(searchTerm)
+                );
+            } else {
+                return String(book[searchField]).toLowerCase().includes(searchTerm);
+            }
+        });
 
         if (filteredBooks.length === 0) {
             resultsDiv.innerHTML = "<p>No results found.</p>";
@@ -206,11 +294,13 @@
                     <p>Collection Location: ${book["Collection Location"]}</p>
                     <p>Item Status: ${book["Item Status"]}</p>
                     <p>Practice Area: ${book["Practice Area"]}</p>
+                    <p>Publication Year: ${book["Publication Year"]}</p>
+                    <p>Copy: ${book["Copy"]}</p>
                 `;
                 if (isAdmin) {
                     bookDiv.innerHTML += `
-                        <button onclick="editBook(${index})">Edit</button>
-                        <button onclick="deleteBook(${index})">Delete</button>
+                        <button onclick="editBook(${books.indexOf(book)})">Edit</button>
+                        <button onclick="deleteBook(${books.indexOf(book)})">Delete</button>
                     `;
                 }
                 resultsDiv.appendChild(bookDiv);
@@ -232,12 +322,15 @@
             "Call Number": document.getElementById("callNumberInput").value,
             "Collection Location": document.getElementById("locationInput").value,
             "Item Status": document.getElementById("statusInput").value,
-            "Practice Area": document.getElementById("practiceAreaInput").value
+            "Practice Area": document.getElementById("practiceAreaInput").value,
+            "Publication Year": document.getElementById("publicationYearInput").value,
+            "Copy": document.getElementById("copyInput").value
         };
         books.push(newBook);
         alert("Book added successfully!");
         document.getElementById("addBookForm").reset();
         searchBooks(true); // Refresh the admin book list
+        updateFilterOptions();
     }
 
     function deleteBook(index) {
@@ -245,6 +338,7 @@
             books.splice(index, 1);
             alert("Book deleted successfully!");
             searchBooks(true); // Refresh the admin book list
+            updateFilterOptions();
         }
     }
 
@@ -257,6 +351,8 @@
         document.getElementById("editLocationInput").value = book["Collection Location"];
         document.getElementById("editStatusInput").value = book["Item Status"];
         document.getElementById("editPracticeAreaInput").value = book["Practice Area"];
+        document.getElementById("editPublicationYearInput").value = book["Publication Year"];
+        document.getElementById("editCopyInput").value = book["Copy"];
         document.getElementById("editModal").style.display = "block";
     }
 
@@ -270,12 +366,15 @@
             "Call Number": document.getElementById("editCallNumberInput").value,
             "Collection Location": document.getElementById("editLocationInput").value,
             "Item Status": document.getElementById("editStatusInput").value,
-            "Practice Area": document.getElementById("editPracticeAreaInput").value
+            "Practice Area": document.getElementById("editPracticeAreaInput").value,
+            "Publication Year": document.getElementById("editPublicationYearInput").value,
+            "Copy": document.getElementById("editCopyInput").value
         };
 
         alert("Book updated successfully!");
         document.getElementById("editModal").style.display = "none";
         searchBooks(true); // Refresh the admin book list
+        updateFilterOptions();
         editingIndex = -1;
     }
 
@@ -311,13 +410,40 @@
 
             feedbackDiv.innerHTML = `Upload complete. ${successCount} books added successfully. ${errorCount} errors encountered.`;
             searchBooks(true); // Refresh the admin book list
+            updateFilterOptions();
         };
         reader.readAsArrayBuffer(file);
     }
 
     function validateBookData(book) {
-        const requiredFields = ["Title", "Author", "Call Number", "Collection Location", "Item Status", "Practice Area"];
+        const requiredFields = ["Title", "Author", "Call Number", "Collection Location", "Item Status", "Practice Area", "Publication Year", "Copy"];
         return requiredFields.every(field => book.hasOwnProperty(field) && book[field]);
+    }
+
+    function exportCatalog() {
+        const worksheet = XLSX.utils.json_to_sheet(books);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Books");
+        XLSX.writeFile(workbook, "LexLiber_Catalog.xlsx");
+    }
+
+    function updateFilterOptions() {
+        const practiceAreas = [...new Set(books.map(book => book["Practice Area"]))];
+        const publicationYears = [...new Set(books.map(book => book["Publication Year"]))];
+
+        const practiceAreaFilter = document.getElementById("practiceAreaFilter");
+        const publicationYearFilter = document.getElementById("publicationYearFilter");
+
+        practiceAreaFilter.innerHTML = '<option value="">All Practice Areas</option>';
+        publicationYearFilter.innerHTML = '<option value="">All Years</option>';
+
+        practiceAreas.forEach(area => {
+            practiceAreaFilter.innerHTML += `<option value="${area}">${area}</option>`;
+        });
+
+        publicationYears.forEach(year => {
+            publicationYearFilter.innerHTML += `<option value="${year}">${year}</option>`;
+        });
     }
 
     function init() {
@@ -328,6 +454,7 @@
         const addBookForm = document.getElementById("addBookForm");
         const editBookForm = document.getElementById("editBookForm");
         const bulkUploadButton = document.getElementById("bulkUploadButton");
+        const exportButton = document.getElementById("exportButton");
         const modal = document.getElementById("editModal");
         const closeButton = modal.querySelector(".close");
         
@@ -361,6 +488,11 @@
             console.log("Bulk upload button listener added");
         }
 
+        if (exportButton) {
+            exportButton.addEventListener("click", exportCatalog);
+            console.log("Export button listener added");
+        }
+
         closeButton.onclick = function() {
             modal.style.display = "none";
         }
@@ -370,6 +502,8 @@
                 modal.style.display = "none";
             }
         }
+
+        updateFilterOptions();
     }
 
     document.addEventListener('DOMContentLoaded', init);
