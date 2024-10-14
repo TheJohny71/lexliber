@@ -40,7 +40,9 @@
                 try {
                     const response = await fetch('Sheet1.json');
                     const data = await response.json();
-                    console.log('Loaded data:', data);  // Debug log
+                    console.log('Loaded data:', data);
+                    console.log('Number of books loaded:', data.length);
+                    console.log('First book:', data[0]);
                     setBooks(data);
                 } catch (error) {
                     console.error('Error loading data:', error);
@@ -56,14 +58,20 @@
             };
 
             const filteredBooks = books.filter(book => {
-                const searchRegex = new RegExp(searchTerm, 'i');
-                return Object.values(book).some(value => 
-                    typeof value === 'string' && searchRegex.test(value)
-                );
+                console.log('Checking book:', book);
+                const searchLower = searchTerm.toLowerCase();
+                const titleMatch = book.Title && book.Title.toLowerCase().includes(searchLower);
+                const callNoMatch = book["Call No."] && book["Call No."].toLowerCase().includes(searchLower);
+                const statusMatch = book["Item Status"] && book["Item Status"].toLowerCase().includes(searchLower);
+                const locationMatch = book["Collection Location"] && book["Collection Location"].toLowerCase().includes(searchLower);
+                
+                console.log('Matches:', { titleMatch, callNoMatch, statusMatch, locationMatch });
+                
+                return titleMatch || callNoMatch || statusMatch || locationMatch;
             });
 
-            console.log('Search term:', searchTerm);  // Debug log
-            console.log('Filtered books:', filteredBooks);  // Debug log
+            console.log('Search term:', searchTerm);
+            console.log('Number of filtered books:', filteredBooks.length);
 
             return (
                 <div>
