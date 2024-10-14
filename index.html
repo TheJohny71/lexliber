@@ -174,47 +174,58 @@
         }
     }
 
-    // ... (keep all other functions unchanged)
-
-    function init() {
-        console.log("Initializing...");
-        const userSearchButton = document.getElementById("userSearchButton");
-        const adminSearchButton = document.getElementById("adminSearchButton");
-        const adminIcon = document.getElementById("adminIcon");
-        const addBookForm = document.getElementById("addBookForm");
-        const bulkUploadButton = document.getElementById("bulkUploadButton");
-        const modal = document.getElementById("editModal");
-        const closeButton = modal.querySelector(".close");
-        
-        if (userSearchButton) {
-            userSearchButton.addEventListener("click", () => {
-                currentPage = 1;
-                searchBooks(false);
-            });
-            console.log("User search button listener added");
-        } else {
-            console.error("User search button not found");
-        }
-
-        if (adminSearchButton) {
-            adminSearchButton.addEventListener("click", () => {
-                currentPage = 1;
-                searchBooks(true);
-            });
-            console.log("Admin search button listener added");
-        } else {
-            console.error("Admin search button not found");
-        }
-
-        // ... (keep the rest of the init function unchanged)
+    function toggleInterface() {
+        console.log("Toggle interface called");
+        document.getElementById("userInterface").classList.toggle("hidden");
+        document.getElementById("adminInterface").classList.toggle("hidden");
+        // Reset search results and pagination when switching interfaces
+        document.getElementById("userResults").innerHTML = "";
+        document.getElementById("adminResults").innerHTML = "";
+        document.getElementById("userPagination").innerHTML = "";
+        document.getElementById("adminPagination").innerHTML = "";
+        currentPage = 1;
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log("DOM fully loaded");
-        init();
-    });
+    function isCallNumberUnique(callNumber, currentIndex = -1) {
+        return !books.some((book, index) => index !== currentIndex && book["Call Number"] === callNumber);
+    }
 
-    console.log("Script finished");
-    </script>
-</body>
-</html>
+    function addBook(event) {
+        event.preventDefault();
+        console.log("Add book function called");
+        const callNumber = document.getElementById("callNumberInput").value;
+        
+        if (!isCallNumberUnique(callNumber)) {
+            alert("Error: A book with this Call Number already exists. Please use a unique Call Number.");
+            return;
+        }
+        
+        const newBook = {
+            "Title": document.getElementById("titleInput").value,
+            "Author": document.getElementById("authorInput").value,
+            "Call Number": callNumber,
+            "Collection Location": document.getElementById("locationInput").value,
+            "Item Status": document.getElementById("statusInput").value,
+            "Practice Area": document.getElementById("practiceAreaInput").value
+        };
+        books.push(newBook);
+        alert("Book added successfully!");
+        document.getElementById("addBookForm").reset();
+        searchBooks(true); // Refresh the admin book list
+    }
+
+    function editBook(index) {
+        const book = books[index];
+        document.getElementById("editTitleInput").value = book.Title;
+        document.getElementById("editAuthorInput").value = book.Author;
+        document.getElementById("editCallNumberInput").value = book["Call Number"];
+        document.getElementById("editLocationInput").value = book["Collection Location"];
+        document.getElementById("editStatusInput").value = book["Item Status"];
+        document.getElementById("editPracticeAreaInput").value = book["Practice Area"];
+        
+        const modal = document.getElementById("editModal");
+        modal.style.display = "block";
+        
+        document.getElementById("editBookForm").onsubmit = function(event) {
+            event.preventDefault();
+            const newCall
