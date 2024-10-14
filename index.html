@@ -10,6 +10,31 @@
         .gear-icon { cursor: pointer; }
         form { margin-top: 20px; }
         input, button { margin: 5px 0; display: block; }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -39,6 +64,22 @@
         <div id="adminResults"></div>
     </div>
 
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Book</h2>
+            <form id="editBookForm">
+                <input type="text" id="editTitleInput" placeholder="Title" required>
+                <input type="text" id="editAuthorInput" placeholder="Author" required>
+                <input type="text" id="editCallNumberInput" placeholder="Call Number" required>
+                <input type="text" id="editLocationInput" placeholder="Collection Location" required>
+                <input type="text" id="editStatusInput" placeholder="Item Status" required>
+                <input type="text" id="editPracticeAreaInput" placeholder="Practice Area" required>
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
     <script>
     console.log("Script started");
 
@@ -47,6 +88,8 @@
         { "Title": "Sample Book 2", "Author": "Jane Smith", "Call Number": "XYZ789", "Collection Location": "Law Library", "Item Status": "Checked Out", "Practice Area": "Criminal Law" },
         { "Title": "Contract", "Author": "JD", "Call Number": "123", "Collection Location": "stack", "Item Status": "checked out", "Practice Area": "transactions" }
     ];
+
+    let editingIndex = -1;
 
     function searchBooks(isAdmin = false) {
         console.log("Search function called");
@@ -77,6 +120,7 @@
                 `;
                 if (isAdmin) {
                     bookDiv.innerHTML += `
+                        <button onclick="editBook(${index})">Edit</button>
                         <button onclick="deleteBook(${index})">Delete</button>
                     `;
                 }
@@ -115,12 +159,46 @@
         }
     }
 
+    function editBook(index) {
+        editingIndex = index;
+        const book = books[index];
+        document.getElementById("editTitleInput").value = book.Title;
+        document.getElementById("editAuthorInput").value = book.Author;
+        document.getElementById("editCallNumberInput").value = book["Call Number"];
+        document.getElementById("editLocationInput").value = book["Collection Location"];
+        document.getElementById("editStatusInput").value = book["Item Status"];
+        document.getElementById("editPracticeAreaInput").value = book["Practice Area"];
+        document.getElementById("editModal").style.display = "block";
+    }
+
+    function saveEditedBook(event) {
+        event.preventDefault();
+        if (editingIndex === -1) return;
+        
+        books[editingIndex] = {
+            "Title": document.getElementById("editTitleInput").value,
+            "Author": document.getElementById("editAuthorInput").value,
+            "Call Number": document.getElementById("editCallNumberInput").value,
+            "Collection Location": document.getElementById("editLocationInput").value,
+            "Item Status": document.getElementById("editStatusInput").value,
+            "Practice Area": document.getElementById("editPracticeAreaInput").value
+        };
+
+        alert("Book updated successfully!");
+        document.getElementById("editModal").style.display = "none";
+        searchBooks(true); // Refresh the admin book list
+        editingIndex = -1;
+    }
+
     function init() {
         console.log("Initializing...");
         const userSearchButton = document.getElementById("userSearchButton");
         const adminSearchButton = document.getElementById("adminSearchButton");
         const adminIcon = document.getElementById("adminIcon");
         const addBookForm = document.getElementById("addBookForm");
+        const editBookForm = document.getElementById("editBookForm");
+        const modal = document.getElementById("editModal");
+        const closeButton = modal.querySelector(".close");
         
         if (userSearchButton) {
             userSearchButton.addEventListener("click", () => searchBooks(false));
@@ -140,6 +218,21 @@
         if (addBookForm) {
             addBookForm.addEventListener("submit", addBook);
             console.log("Add book form listener added");
+        }
+
+        if (editBookForm) {
+            editBookForm.addEventListener("submit", saveEditedBook);
+            console.log("Edit book form listener added");
+        }
+
+        closeButton.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
         }
     }
 
