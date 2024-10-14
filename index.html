@@ -40,6 +40,7 @@
                 try {
                     const response = await fetch('Sheet1.json');
                     const data = await response.json();
+                    console.log('Loaded data:', data);  // Debug log
                     setBooks(data);
                 } catch (error) {
                     console.error('Error loading data:', error);
@@ -54,12 +55,15 @@
                 setSearchTerm(event.target.value);
             };
 
-            const filteredBooks = books.filter(book =>
-                book.Title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                book["Call No."]?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                book["Item Status"]?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                book["Collection Location"]?.toLowerCase().includes(searchTerm.toLowerCase())
-            );
+            const filteredBooks = books.filter(book => {
+                const searchRegex = new RegExp(searchTerm, 'i');
+                return Object.values(book).some(value => 
+                    typeof value === 'string' && searchRegex.test(value)
+                );
+            });
+
+            console.log('Search term:', searchTerm);  // Debug log
+            console.log('Filtered books:', filteredBooks);  // Debug log
 
             return (
                 <div>
@@ -70,26 +74,30 @@
                         value={searchTerm}
                         onChange={handleSearch}
                     />
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Call Number</th>
-                                <th>Status</th>
-                                <th>Location</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredBooks.map((book, index) => (
-                                <tr key={index}>
-                                    <td>{book.Title}</td>
-                                    <td>{book["Call No."]}</td>
-                                    <td>{book["Item Status"]}</td>
-                                    <td>{book["Collection Location"]}</td>
+                    {filteredBooks.length > 0 ? (
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Call Number</th>
+                                    <th>Status</th>
+                                    <th>Location</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {filteredBooks.map((book, index) => (
+                                    <tr key={index}>
+                                        <td>{book.Title}</td>
+                                        <td>{book["Call No."]}</td>
+                                        <td>{book["Item Status"]}</td>
+                                        <td>{book["Collection Location"]}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p>No results found for "{searchTerm}"</p>
+                    )}
                 </div>
             );
         }
