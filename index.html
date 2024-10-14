@@ -3,20 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexLiber Search Test</title>
+    <title>LexLiber</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .hidden { display: none; }
+        .gear-icon { cursor: pointer; }
+    </style>
 </head>
 <body>
-    <h1>LexLiber Search Test</h1>
-    <input type="text" id="searchInput" placeholder="Enter search term...">
-    <button id="searchButton">Search</button>
-    <div id="results"></div>
+    <h1>LexLiber</h1>
+    <i class="fas fa-cog gear-icon" id="adminIcon"></i>
+    
+    <div id="userInterface">
+        <input type="text" id="searchInput" placeholder="Enter search term...">
+        <button id="searchButton">Search</button>
+        <div id="results"></div>
+    </div>
+
+    <div id="adminInterface" class="hidden">
+        <h2>Admin Interface</h2>
+        <p>Admin features will be added here.</p>
+    </div>
 
     <script>
     console.log("Script started");
 
     let books = [
-        { "Title": "Sample Book 1", "Author": "John Doe" },
-        { "Title": "Sample Book 2", "Author": "Jane Smith" }
+        { "Title": "Sample Book 1", "Author": "John Doe", "Call Number": "ABC123", "Collection Location": "Main Library", "Item Status": "Available", "Practice Area": "General Law" },
+        { "Title": "Sample Book 2", "Author": "Jane Smith", "Call Number": "XYZ789", "Collection Location": "Law Library", "Item Status": "Checked Out", "Practice Area": "Criminal Law" }
     ];
 
     function searchBooks() {
@@ -26,8 +40,9 @@
         resultsDiv.innerHTML = "";
 
         const filteredBooks = books.filter(book => 
-            book.Title.toLowerCase().includes(searchTerm) || 
-            book.Author.toLowerCase().includes(searchTerm)
+            Object.values(book).some(value => 
+                String(value).toLowerCase().includes(searchTerm)
+            )
         );
 
         if (filteredBooks.length === 0) {
@@ -35,21 +50,42 @@
         } else {
             filteredBooks.forEach(book => {
                 const bookDiv = document.createElement("div");
-                bookDiv.innerHTML = `<p>${book.Title} by ${book.Author}</p>`;
+                bookDiv.innerHTML = `
+                    <h3>${book.Title}</h3>
+                    <p>Author: ${book.Author}</p>
+                    <p>Call Number: ${book["Call Number"]}</p>
+                    <p>Collection Location: ${book["Collection Location"]}</p>
+                    <p>Item Status: ${book["Item Status"]}</p>
+                    <p>Practice Area: ${book["Practice Area"]}</p>
+                `;
                 resultsDiv.appendChild(bookDiv);
             });
         }
     }
 
+    function toggleInterface() {
+        console.log("Toggle interface called");
+        document.getElementById("userInterface").classList.toggle("hidden");
+        document.getElementById("adminInterface").classList.toggle("hidden");
+    }
+
     function init() {
         console.log("Initializing...");
         const searchButton = document.getElementById("searchButton");
+        const adminIcon = document.getElementById("adminIcon");
         
         if (searchButton) {
             searchButton.addEventListener("click", searchBooks);
             console.log("Search button listener added");
         } else {
             console.error("Search button not found");
+        }
+
+        if (adminIcon) {
+            adminIcon.addEventListener("click", toggleInterface);
+            console.log("Admin icon listener added");
+        } else {
+            console.error("Admin icon not found");
         }
     }
 
