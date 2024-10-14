@@ -4,86 +4,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LexLiber</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-green: #00a68e;
+            --charcoal: #000000;
+            --gray-1: #f7f7f7;
+            --white: #ffffff;
+            --black: #000000;
+            --violet: #7379b9;
+            --coral: #f27557;
+            --blue: #278bcb;
+            --gray-2: #c7c7c7;
+            --chartreuse: #cad23b;
+        }
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
+            font-family: 'Roboto', Arial, sans-serif;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            text-align: center;
+            background-color: var(--gray-1);
+            color: var(--charcoal);
         }
         .logo {
             max-width: 200px;
             margin-bottom: 20px;
         }
-        .search-container {
+        .nav-tabs {
+            display: flex;
             margin-bottom: 20px;
+        }
+        .nav-tab {
+            padding: 10px 20px;
+            background-color: var(--gray-2);
+            color: var(--charcoal);
+            text-decoration: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .nav-tab.active {
+            background-color: var(--primary-green);
+            color: var(--white);
+        }
+        .search-container, .admin-container {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         input, select, button {
             margin: 10px;
             padding: 8px;
             font-size: 16px;
+            border: 1px solid var(--gray-2);
+            border-radius: 4px;
         }
-        #searchInput {
-            width: 300px;
-        }
-        #practiceAreaSelect {
-            width: 200px;
-        }
-        #searchButton {
-            background-color: #4CAF50;
-            color: white;
+        button {
+            background-color: var(--primary-green);
+            color: var(--white);
             border: none;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
-        #searchButton:hover {
-            background-color: #45a049;
+        button:hover {
+            background-color: #008c7a;
         }
         #results {
             margin-top: 20px;
-            text-align: left;
         }
         .book-item {
-            border: 1px solid #ddd;
-            padding: 10px;
+            background-color: var(--white);
+            border: 1px solid var(--gray-2);
+            padding: 15px;
             margin-bottom: 10px;
-            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .book-item h3 {
+            color: var(--primary-green);
+            margin-top: 0;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
     <img src="lexliber-logo.png.jpg" alt="LexLiber Logo" class="logo">
-    <div class="search-container">
+    <div class="nav-tabs">
+        <a href="#" class="nav-tab active" id="userTab">End User</a>
+        <a href="#" class="nav-tab" id="adminTab">Admin</a>
+    </div>
+    <div id="userInterface" class="search-container">
         <input type="text" id="searchInput" placeholder="Enter search term...">
         <select id="practiceAreaSelect">
             <option value="">All Practice Areas</option>
         </select>
         <button id="searchButton">Search</button>
+        <div id="results"></div>
     </div>
-    <div id="results"></div>
+    <div id="adminInterface" class="admin-container hidden">
+        <h2>Admin Interface</h2>
+        <form id="addBookForm">
+            <input type="text" id="titleInput" placeholder="Title" required>
+            <input type="text" id="authorInput" placeholder="Author" required>
+            <input type="text" id="callNumberInput" placeholder="Call Number" required>
+            <input type="text" id="locationInput" placeholder="Collection Location" required>
+            <input type="text" id="statusInput" placeholder="Item Status" required>
+            <input type="text" id="practiceAreaInput" placeholder="Practice Area" required>
+            <button type="submit">Add Book</button>
+        </form>
+    </div>
 
     <script>
         const books = [
-            {
-                "Title": "Fundamentals of Taxation 2023 Edition",
-                "Author": "Cruz, Ana / Deschamps, Michael / Niswander, Frederick / Prendergast, Debra / Schisler, Dan",
-                "Call Number": "KF 6369.8 .C78 2023",
-                "Collection Location": "Stacks",
-                "Item Status": "Available",
-                "Practice Area": "Tax Law"
-            },
-            {
-                "Title": "Fundamentals of Federal Income Taxation",
-                "Author": "Freeland, James J. / Lathrope, Daniel J. / Lind, Stephen A. / Stephens, Richard B.",
-                "Call Number": "KF 6369 .F74 2018",
-                "Collection Location": "Stacks",
-                "Item Status": "Available",
-                "Practice Area": "Tax Law"
-            },
-            // ... (rest of the books array)
+            // Your existing book data here
         ];
 
-        // Populate practice area dropdown
         function populatePracticeAreas() {
             const practiceAreas = new Set(books.map(book => book["Practice Area"]));
             const select = document.getElementById("practiceAreaSelect");
@@ -95,7 +131,6 @@
             });
         }
 
-        // Search function
         function searchBooks() {
             const searchTerm = document.getElementById("searchInput").value.toLowerCase();
             const practiceArea = document.getElementById("practiceAreaSelect").value;
@@ -128,26 +163,42 @@
             }
         }
 
-        // Initialize the page
-        function init() {
+        function addBook(event) {
+            event.preventDefault();
+            const newBook = {
+                "Title": document.getElementById("titleInput").value,
+                "Author": document.getElementById("authorInput").value,
+                "Call Number": document.getElementById("callNumberInput").value,
+                "Collection Location": document.getElementById("locationInput").value,
+                "Item Status": document.getElementById("statusInput").value,
+                "Practice Area": document.getElementById("practiceAreaInput").value
+            };
+            books.push(newBook);
+            alert("Book added successfully!");
+            document.getElementById("addBookForm").reset();
             populatePracticeAreas();
-            const searchButton = document.getElementById('searchButton');
-            if (searchButton) {
-                searchButton.addEventListener('click', searchBooks);
-            }
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        searchBooks();
-                    }
-                });
-            }
         }
 
-        // Call init when the DOM is fully loaded
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
+        function switchTab(tabId) {
+            document.getElementById("userInterface").classList.toggle("hidden", tabId !== "userTab");
+            document.getElementById("adminInterface").classList.toggle("hidden", tabId !== "adminTab");
+            document.getElementById("userTab").classList.toggle("active", tabId === "userTab");
+            document.getElementById("adminTab").classList.toggle("active", tabId === "adminTab");
+        }
+
+        function init() {
+            populatePracticeAreas();
+            document.getElementById("searchButton").addEventListener("click", searchBooks);
+            document.getElementById("searchInput").addEventListener("keypress", function(e) {
+                if (e.key === "Enter") searchBooks();
+            });
+            document.getElementById("addBookForm").addEventListener("submit", addBook);
+            document.getElementById("userTab").addEventListener("click", () => switchTab("userTab"));
+            document.getElementById("adminTab").addEventListener("click", () => switchTab("adminTab"));
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", init);
         } else {
             init();
         }
