@@ -90,9 +90,15 @@
         async function loadBooks() {
             try {
                 const response = await fetch('Sheet1.json');
-                books = await response.json();
-                console.log('Books loaded:', books);
-                displayBooks(books);
+                const text = await response.text();
+                console.log('Response text:', text);
+                try {
+                    books = JSON.parse(text);
+                    console.log('Books loaded:', books);
+                    displayBooks(books);
+                } catch (parseError) {
+                    console.error('Error parsing JSON:', parseError);
+                }
             } catch (error) {
                 console.error('Error loading books:', error);
             }
