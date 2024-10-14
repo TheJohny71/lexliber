@@ -73,6 +73,19 @@
             max-width: 200px;
             margin: 0 auto 20px;
         }
+        button {
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: var(--blue);
+        }
     </style>
 </head>
 <body>
@@ -94,17 +107,17 @@
                 console.log('Fetch response:', response);
                 console.log('Response status:', response.status);
                 const text = await response.text();
-                console.log('Response text:', text.substring(0, 200)); // Log first 200 characters
                 books = JSON.parse(text);
                 console.log('Books loaded:', books.length);
+                console.log('First 5 books:', books.slice(0, 5));
                 displayBooks(books);
             } catch (error) {
                 console.error('Error loading books:', error);
             }
         }
 
-        function displayBooks(booksToShow) {
-            console.log(`Displaying ${booksToShow.length} books`);
+        function displayBooks(booksToShow, limit = 50) {
+            console.log(`Displaying ${Math.min(booksToShow.length, limit)} out of ${booksToShow.length} books`);
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '';
 
@@ -113,7 +126,7 @@
                 return;
             }
 
-            booksToShow.forEach(book => {
+            booksToShow.slice(0, limit).forEach(book => {
                 const bookElement = document.createElement('div');
                 bookElement.className = 'book';
                 bookElement.innerHTML = `
@@ -125,6 +138,13 @@
                 `;
                 resultsDiv.appendChild(bookElement);
             });
+
+            if (booksToShow.length > limit) {
+                const showMoreButton = document.createElement('button');
+                showMoreButton.textContent = 'Show More';
+                showMoreButton.onclick = () => displayBooks(booksToShow, limit + 50);
+                resultsDiv.appendChild(showMoreButton);
+            }
         }
 
         function searchBooks(searchTerm) {
