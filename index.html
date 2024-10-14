@@ -20,6 +20,12 @@
         th {
             background-color: #f2f2f2;
         }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
@@ -28,6 +34,7 @@
     <script type="text/babel">
         function LibraryCatalog() {
             const [books, setBooks] = React.useState([]);
+            const [searchTerm, setSearchTerm] = React.useState('');
 
             const loadData = async () => {
                 try {
@@ -43,9 +50,26 @@
                 loadData();
             }, []);
 
+            const handleSearch = (event) => {
+                setSearchTerm(event.target.value);
+            };
+
+            const filteredBooks = books.filter(book =>
+                book.Title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                book["Call No."]?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                book["Item Status"]?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                book["Collection Location"]?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
             return (
                 <div>
                     <h1>Library Catalog</h1>
+                    <input 
+                        type="text" 
+                        placeholder="Search books..." 
+                        value={searchTerm}
+                        onChange={handleSearch}
+                    />
                     <table>
                         <thead>
                             <tr>
@@ -56,7 +80,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {books.map((book, index) => (
+                            {filteredBooks.map((book, index) => (
                                 <tr key={index}>
                                     <td>{book.Title}</td>
                                     <td>{book["Call No."]}</td>
