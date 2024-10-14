@@ -3,30 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexLiber Test</title>
+    <title>LexLiber Search Test</title>
 </head>
 <body>
-    <h1>LexLiber Test Page</h1>
-    <button id="testButton">Test Button</button>
-    <p id="output"></p>
+    <h1>LexLiber Search Test</h1>
+    <input type="text" id="searchInput" placeholder="Enter search term...">
+    <button id="searchButton">Search</button>
+    <div id="results"></div>
 
     <script>
     console.log("Script started");
 
-    function testFunction() {
-        console.log("Test function called");
-        document.getElementById("output").textContent = "Button clicked at " + new Date().toLocaleTimeString();
+    let books = [
+        { "Title": "Sample Book 1", "Author": "John Doe" },
+        { "Title": "Sample Book 2", "Author": "Jane Smith" }
+    ];
+
+    function searchBooks() {
+        console.log("Search function called");
+        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+        const resultsDiv = document.getElementById("results");
+        resultsDiv.innerHTML = "";
+
+        const filteredBooks = books.filter(book => 
+            book.Title.toLowerCase().includes(searchTerm) || 
+            book.Author.toLowerCase().includes(searchTerm)
+        );
+
+        if (filteredBooks.length === 0) {
+            resultsDiv.innerHTML = "<p>No results found.</p>";
+        } else {
+            filteredBooks.forEach(book => {
+                const bookDiv = document.createElement("div");
+                bookDiv.innerHTML = `<p>${book.Title} by ${book.Author}</p>`;
+                resultsDiv.appendChild(bookDiv);
+            });
+        }
     }
 
     function init() {
         console.log("Initializing...");
-        const testButton = document.getElementById("testButton");
+        const searchButton = document.getElementById("searchButton");
         
-        if (testButton) {
-            testButton.addEventListener("click", testFunction);
-            console.log("Test button listener added");
+        if (searchButton) {
+            searchButton.addEventListener("click", searchBooks);
+            console.log("Search button listener added");
         } else {
-            console.error("Test button not found");
+            console.error("Search button not found");
         }
     }
 
