@@ -8,6 +8,8 @@
     <style>
         .hidden { display: none; }
         .gear-icon { cursor: pointer; }
+        form { margin-top: 20px; }
+        input, button { margin: 5px 0; display: block; }
     </style>
 </head>
 <body>
@@ -22,7 +24,15 @@
 
     <div id="adminInterface" class="hidden">
         <h2>Admin Interface</h2>
-        <p>Admin features will be added here.</p>
+        <form id="addBookForm">
+            <input type="text" id="titleInput" placeholder="Title" required>
+            <input type="text" id="authorInput" placeholder="Author" required>
+            <input type="text" id="callNumberInput" placeholder="Call Number" required>
+            <input type="text" id="locationInput" placeholder="Collection Location" required>
+            <input type="text" id="statusInput" placeholder="Item Status" required>
+            <input type="text" id="practiceAreaInput" placeholder="Practice Area" required>
+            <button type="submit">Add Book</button>
+        </form>
     </div>
 
     <script>
@@ -69,10 +79,27 @@
         document.getElementById("adminInterface").classList.toggle("hidden");
     }
 
+    function addBook(event) {
+        event.preventDefault();
+        console.log("Add book function called");
+        const newBook = {
+            "Title": document.getElementById("titleInput").value,
+            "Author": document.getElementById("authorInput").value,
+            "Call Number": document.getElementById("callNumberInput").value,
+            "Collection Location": document.getElementById("locationInput").value,
+            "Item Status": document.getElementById("statusInput").value,
+            "Practice Area": document.getElementById("practiceAreaInput").value
+        };
+        books.push(newBook);
+        alert("Book added successfully!");
+        document.getElementById("addBookForm").reset();
+    }
+
     function init() {
         console.log("Initializing...");
         const searchButton = document.getElementById("searchButton");
         const adminIcon = document.getElementById("adminIcon");
+        const addBookForm = document.getElementById("addBookForm");
         
         if (searchButton) {
             searchButton.addEventListener("click", searchBooks);
@@ -86,6 +113,13 @@
             console.log("Admin icon listener added");
         } else {
             console.error("Admin icon not found");
+        }
+
+        if (addBookForm) {
+            addBookForm.addEventListener("submit", addBook);
+            console.log("Add book form listener added");
+        } else {
+            console.error("Add book form not found");
         }
     }
 
