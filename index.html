@@ -6,28 +6,57 @@
     <title>LexLiber Catalog</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
         }
         #searchInput {
             width: 100%;
             padding: 10px;
             font-size: 16px;
             margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
         .book {
             border: 1px solid #ddd;
             padding: 10px;
             margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .book h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>LexLiber Catalog</h1>
-    <input type="text" id="searchInput" placeholder="Search books...">
-    <div id="results"></div>
+    <img src="lexliber_logo.png" alt="LexLiber Logo" class="logo">
+    <div class="container">
+        <h1>LexLiber Catalog</h1>
+        <input type="text" id="searchInput" placeholder="Search books...">
+        <div id="results"></div>
+    </div>
 
     <script>
         let books = [];
