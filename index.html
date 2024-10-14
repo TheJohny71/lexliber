@@ -3,37 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexLiber Catalog - Debug</title>
+    <title>LexLiber Catalog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #00a68e;
+            --charcoal: #333333;
+            --gray-1: #f7f7f7;
+            --white: #ffffff;
+            --black: #000000;
+            --violet: #7379b9;
+            --coral: #f27557;
+            --blue: #278bcb;
+            --gray-2: #c7c7c7;
+            --chartreuse: #cad23b;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--gray-1);
+            margin: 0;
+            padding: 20px;
+            color: var(--charcoal);
+        }
+        .container {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: var(--primary-green);
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            border: 1px solid var(--gray-2);
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .book {
+            background-color: var(--gray-1);
+            border: 1px solid var(--gray-2);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .book:hover {
+            background-color: var(--chartreuse);
+        }
+        .book h3 {
+            margin-top: 0;
+            color: var(--blue);
+            font-size: 1.2em;
+        }
+        .book p {
+            margin: 5px 0;
+            color: var(--charcoal);
+        }
+        .logo {
+            display: block;
+            max-width: 200px;
+            margin: 0 auto 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>LexLiber Catalog - Debug Mode</h1>
-    <div id="debug"></div>
+    <div class="container">
+        <img src="lexliber-logo.png.jpg" alt="LexLiber Logo" class="logo">
+        <h1>LexLiber Catalog</h1>
+        <input type="text" id="searchInput" placeholder="Search by title, call number, author, or keyword...">
+        <div id="results"></div>
+    </div>
 
     <script>
-        const debugDiv = document.getElementById('debug');
-
-        function log(message) {
-            const p = document.createElement('p');
-            p.textContent = message;
-            debugDiv.appendChild(p);
-            console.log(message);
-        }
-
-        async function testFetch() {
-            log('Starting fetch test...');
-            try {
-                const response = await fetch('Sheet1.json');
-                log(`Fetch response status: ${response.status}`);
-                const text = await response.text();
-                log(`Response text (first 100 characters): ${text.substring(0, 100)}`);
-                log('Fetch test complete.');
-            } catch (error) {
-                log(`Fetch error: ${error.message}`);
+        console.log("Script is running");
+        let books = [
+            {
+                "Title": "Contract Law Basics",
+                "Author": "John Doe",
+                "Call No.": "KF801 .D63 2020",
+                "Item Status": "Available",
+                "Collection Location": "Main Library"
+            },
+            {
+                "Title": "Tort Law and Practice",
+                "Author": "Jane Smith",
+                "Call No.": "KF1250 .S65 2019",
+                "Item Status": "Checked Out",
+                "Collection Location": "Law Library"
+            },
+            {
+                "Title": "Constitutional Law: A Comprehensive Study",
+                "Author": "Robert Johnson",
+                "Call No.": "KF4550 .J64 2021",
+                "Item Status": "Available",
+                "Collection Location": "Reference Section"
             }
+        ];
+
+        function displayBooks(booksToShow) {
+            console.log(`Displaying ${booksToShow.length} books`);
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            if (booksToShow.length === 0) {
+                resultsDiv.innerHTML = '<p>No books found</p>';
+                return;
+            }
+
+            booksToShow.forEach(book => {
+                const bookElement = document.createElement('div');
+                bookElement.className = 'book';
+                bookElement.innerHTML = `
+                    <h3>${book.Title || 'No Title'}</h3>
+                    <p>Author: ${book.Author || 'N/A'}</p>
+                    <p>Call Number: ${book["Call No."] || 'N/A'}</p>
+                    <p>Status: ${book["Item Status"] || 'N/A'}</p>
+                    <p>Location: ${book["Collection Location"] || 'N/A'}</p>
+                `;
+                resultsDiv.appendChild(bookElement);
+            });
         }
 
-        log('Script started');
-        testFetch();
+        function searchBooks(searchTerm) {
+            console.log(`Searching for: ${searchTerm}`);
+            const filteredBooks = books.filter(book => 
+                Object.values(book).some(value => 
+                    value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+            console.log(`Found ${filteredBooks.length} books`);
+            displayBooks(filteredBooks);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchBooks(e.target.value);
+        });
+
+        displayBooks(books);
     </script>
 </body>
 </html>
