@@ -5,46 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LexLiber</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <style>
         .hidden { display: none; }
         .gear-icon { cursor: pointer; }
         form { margin-top: 20px; }
         input, button { margin: 5px 0; display: block; }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-        }
-        .pagination button {
-            margin: 0 10px;
-        }
     </style>
 </head>
 <body>
@@ -55,7 +20,6 @@
         <input type="text" id="userSearchInput" placeholder="Enter search term...">
         <button id="userSearchButton">Search</button>
         <div id="userResults"></div>
-        <div id="userPagination" class="pagination"></div>
     </div>
 
     <div id="adminInterface" class="hidden">
@@ -69,31 +33,10 @@
             <input type="text" id="practiceAreaInput" placeholder="Practice Area" required>
             <button type="submit">Add Book</button>
         </form>
-        <h3>Bulk Upload</h3>
-        <input type="file" id="bulkUploadInput" accept=".xlsx,.xls,.csv">
-        <button id="bulkUploadButton">Upload File</button>
-        <div id="uploadFeedback"></div>
         <h3>Manage Books</h3>
         <input type="text" id="adminSearchInput" placeholder="Search books...">
         <button id="adminSearchButton">Search</button>
         <div id="adminResults"></div>
-        <div id="adminPagination" class="pagination"></div>
-    </div>
-
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Edit Book</h2>
-            <form id="editBookForm">
-                <input type="text" id="editTitleInput" placeholder="Title" required>
-                <input type="text" id="editAuthorInput" placeholder="Author" required>
-                <input type="text" id="editCallNumberInput" placeholder="Call Number" required>
-                <input type="text" id="editLocationInput" placeholder="Collection Location" required>
-                <input type="text" id="editStatusInput" placeholder="Item Status" required>
-                <input type="text" id="editPracticeAreaInput" placeholder="Practice Area" required>
-                <button type="submit">Save Changes</button>
-            </form>
-        </div>
     </div>
 
     <script>
@@ -105,18 +48,13 @@
         { "Title": "Contract", "Author": "JD", "Call Number": "123", "Collection Location": "stack", "Item Status": "checked out", "Practice Area": "transactions" }
     ];
 
-    const booksPerPage = 10;
-    let currentPage = 1;
-
     function searchBooks(isAdmin = false) {
         console.log("Search function called");
         const searchTerm = isAdmin 
             ? document.getElementById("adminSearchInput").value.toLowerCase()
             : document.getElementById("userSearchInput").value.toLowerCase();
         const resultsDiv = isAdmin ? document.getElementById("adminResults") : document.getElementById("userResults");
-        const paginationDiv = isAdmin ? document.getElementById("adminPagination") : document.getElementById("userPagination");
         resultsDiv.innerHTML = "";
-        paginationDiv.innerHTML = "";
 
         const filteredBooks = books.filter(book => 
             Object.values(book).some(value => 
@@ -127,12 +65,7 @@
         if (filteredBooks.length === 0) {
             resultsDiv.innerHTML = "<p>No results found.</p>";
         } else {
-            const totalPages = Math.ceil(filteredBooks.length / booksPerPage);
-            const startIndex = (currentPage - 1) * booksPerPage;
-            const endIndex = startIndex + booksPerPage;
-            const booksToShow = filteredBooks.slice(startIndex, endIndex);
-
-            booksToShow.forEach((book, index) => {
+            filteredBooks.forEach((book, index) => {
                 const bookDiv = document.createElement("div");
                 bookDiv.innerHTML = `
                     <h3>${book.Title}</h3>
@@ -142,34 +75,7 @@
                     <p>Item Status: ${book["Item Status"]}</p>
                     <p>Practice Area: ${book["Practice Area"]}</p>
                 `;
-                if (isAdmin) {
-                    bookDiv.innerHTML += `
-                        <button onclick="editBook(${startIndex + index})">Edit</button>
-                        <button onclick="deleteBook(${startIndex + index})">Delete</button>
-                    `;
-                }
                 resultsDiv.appendChild(bookDiv);
-            });
-
-            // Add pagination controls
-            paginationDiv.innerHTML = `
-                <button id="prevPage" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>
-                <span>Page ${currentPage} of ${totalPages}</span>
-                <button id="nextPage" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
-            `;
-
-            document.getElementById("prevPage").addEventListener("click", () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    searchBooks(isAdmin);
-                }
-            });
-
-            document.getElementById("nextPage").addEventListener("click", () => {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    searchBooks(isAdmin);
-                }
             });
         }
     }
@@ -178,54 +84,33 @@
         console.log("Toggle interface called");
         document.getElementById("userInterface").classList.toggle("hidden");
         document.getElementById("adminInterface").classList.toggle("hidden");
-        // Reset search results and pagination when switching interfaces
-        document.getElementById("userResults").innerHTML = "";
-        document.getElementById("adminResults").innerHTML = "";
-        document.getElementById("userPagination").innerHTML = "";
-        document.getElementById("adminPagination").innerHTML = "";
-        currentPage = 1;
     }
 
-    function isCallNumberUnique(callNumber, currentIndex = -1) {
-        return !books.some((book, index) => index !== currentIndex && book["Call Number"] === callNumber);
-    }
-
-    function addBook(event) {
-        event.preventDefault();
-        console.log("Add book function called");
-        const callNumber = document.getElementById("callNumberInput").value;
+    function init() {
+        console.log("Initializing...");
+        const userSearchButton = document.getElementById("userSearchButton");
+        const adminSearchButton = document.getElementById("adminSearchButton");
+        const adminIcon = document.getElementById("adminIcon");
         
-        if (!isCallNumberUnique(callNumber)) {
-            alert("Error: A book with this Call Number already exists. Please use a unique Call Number.");
-            return;
+        if (userSearchButton) {
+            userSearchButton.addEventListener("click", () => searchBooks(false));
+            console.log("User search button listener added");
         }
-        
-        const newBook = {
-            "Title": document.getElementById("titleInput").value,
-            "Author": document.getElementById("authorInput").value,
-            "Call Number": callNumber,
-            "Collection Location": document.getElementById("locationInput").value,
-            "Item Status": document.getElementById("statusInput").value,
-            "Practice Area": document.getElementById("practiceAreaInput").value
-        };
-        books.push(newBook);
-        alert("Book added successfully!");
-        document.getElementById("addBookForm").reset();
-        searchBooks(true); // Refresh the admin book list
+
+        if (adminSearchButton) {
+            adminSearchButton.addEventListener("click", () => searchBooks(true));
+            console.log("Admin search button listener added");
+        }
+
+        if (adminIcon) {
+            adminIcon.addEventListener("click", toggleInterface);
+            console.log("Admin icon listener added");
+        }
     }
 
-    function editBook(index) {
-        const book = books[index];
-        document.getElementById("editTitleInput").value = book.Title;
-        document.getElementById("editAuthorInput").value = book.Author;
-        document.getElementById("editCallNumberInput").value = book["Call Number"];
-        document.getElementById("editLocationInput").value = book["Collection Location"];
-        document.getElementById("editStatusInput").value = book["Item Status"];
-        document.getElementById("editPracticeAreaInput").value = book["Practice Area"];
-        
-        const modal = document.getElementById("editModal");
-        modal.style.display = "block";
-        
-        document.getElementById("editBookForm").onsubmit = function(event) {
-            event.preventDefault();
-            const newCall
+    document.addEventListener('DOMContentLoaded', init);
+
+    console.log("Script finished");
+    </script>
+</body>
+</html>
