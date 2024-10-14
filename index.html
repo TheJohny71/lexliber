@@ -64,19 +64,55 @@
 
         .hidden { display: none; }
 
-        .gear-icon { 
-            cursor: pointer;
-            font-size: 24px;
-            color: var(--primary-green);
+        .header-icons {
             position: absolute;
             top: 20px;
             right: 20px;
+            display: flex;
+            gap: 10px;
         }
 
-        h1 {
+        .header-icons button {
+            background: none;
+            border: none;
+            color: var(--primary-green);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: auto;
+        }
+
+        .title-container {
             text-align: center;
             margin-bottom: var(--spacing-large);
-            font-size: 2.5em;
+            position: relative;
+        }
+
+        .main-title {
+            font-size: 3em;
+            color: var(--primary-green);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin: 0;
+            padding: 20px 0;
+            position: relative;
+            display: inline-block;
+        }
+
+        .main-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--primary-green), transparent);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: var(--secondary-violet);
+            margin-top: 10px;
         }
 
         .card {
@@ -215,37 +251,41 @@
         }
 
         #themeToggle {
-            position: fixed;
-            top: 20px;
-            right: 60px;
-            background: none;
-            border: none;
-            color: var(--primary-green);
-            font-size: 24px;
-            cursor: pointer;
+            position: static;
+            top: auto;
+            right: auto;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>LexLiber</h1>
-        <button id="themeToggle"><i class="fas fa-adjust"></i></button>
-        <i id="adminIcon" class="fas fa-cog gear-icon"></i>
+        <div class="header-icons">
+            <button id="themeToggle"><i class="fas fa-moon"></i></button>
+            <button id="adminIcon" class="gear-icon"><i class="fas fa-gear"></i></button>
+        </div>
+
+        <div class="title-container">
+            <h1 class="main-title">LexLiber</h1>
+            <p class="subtitle">Your Digital Law Library Assistant</p>
+        </div>
 
         <div id="userInterface">
             <div class="card">
+                <input type="text" id="userSearchInput" placeholder="Search...">
                 <select id="userSearchField">
-                    <option value="all">Search By</option>
+                    <option value="all">All Fields</option>
                     <option value="Title">Title</option>
                     <option value="Author">Author</option>
                     <option value="Call Number">Call Number</option>
-                    <option value="Collection Location">Collection Location</option>
                 </select>
-                <input type="text" id="userSearchInput" placeholder="Enter search term...">
-                <select id="practiceAreaFilter"></select>
-                <select id="publicationYearFilter"></select>
+                <select id="practiceAreaFilter">
+                    <option value="">Practice Areas</option>
+                </select>
+                <select id="publicationYearFilter">
+                    <option value="">Years</option>
+                </select>
                 <select id="itemStatusFilter">
-                    <option value="">Status</option>
+                    <option value="">Item Status</option>
                     <option value="Available">Available</option>
                     <option value="Checked Out">Checked Out</option>
                     <option value="On Hold">On Hold</option>
@@ -258,9 +298,14 @@
 
         <div id="adminInterface" class="hidden">
             <div class="card">
-                <h2>Admin Interface</h2>
+                <input type="text" id="adminSearchInput" placeholder="Search...">
+                <button id="adminSearchButton">Search</button>
+            </div>
+            <div id="adminLoading" class="loading"></div>
+            <div id="adminResults"></div>
+            <div class="card">
+                <h2>Add New Book</h2>
                 <form id="addBookForm">
-                    <h3>Add New Book</h3>
                     <input type="text" id="titleInput" placeholder="Title" required>
                     <input type="text" id="authorInput" placeholder="Author" required>
                     <input type="text" id="callNumberInput" placeholder="Call Number" required>
@@ -273,18 +318,14 @@
                 </form>
             </div>
             <div class="card">
-                <h3>Bulk Upload</h3>
+                <h2>Bulk Upload</h2>
                 <input type="file" id="bulkUploadInput" accept=".xlsx,.xls,.csv">
-                <button id="bulkUploadButton">Upload File</button>
+                <button id="bulkUploadButton">Upload</button>
                 <div id="uploadFeedback"></div>
             </div>
             <div class="card">
-                <h3>Manage Books</h3>
-                <button id="exportButton" class="button-secondary">Export Catalog</button>
-                <input type="text" id="adminSearchInput" placeholder="Search books...">
-                <button id="adminSearchButton">Search</button>
-                <div id="adminLoading" class="loading"></div>
-                <div id="adminResults"></div>
+                <h2>Export Catalog</h2>
+                <button id="exportButton">Export to Excel</button>
             </div>
         </div>
 
@@ -308,331 +349,331 @@
     </div>
 
     <script>
-    let books = [];
-    let editingIndex = -1;
+        let books = [];
+        let editingIndex = -1;
 
-    async function fetchBookData() {
-        try {
-            const response = await fetch('Sheet1 (2).json');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+        async function fetchBookData() {
+            try {
+                const response = await fetch('Sheet1 (2).json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log("Fetched book data:", data);
+                return data;
+            } catch (error) {
+                console.error("Could not fetch book data:", error);
+                return [];
             }
-            const data = await response.json();
-            console.log("Fetched book data:", data);
-            return data;
-        } catch (error) {
-            console.error("Could not fetch book data:", error);
-            return [];
         }
-    }
 
-    function toggleInterface() {
-        const userInterface = document.getElementById("userInterface");
-        const adminInterface = document.getElementById("adminInterface");
-        userInterface.classList.toggle("hidden");
-        adminInterface.classList.toggle("hidden");
-    }
+        function toggleInterface() {
+            const userInterface = document.getElementById("userInterface");
+            const adminInterface = document.getElementById("adminInterface");
+            userInterface.classList.toggle("hidden");
+            adminInterface.classList.toggle("hidden");
+        }
 
-    function searchBooks(isAdmin = false) {
-        console.log("Search function called");
-        console.log("Current books in catalog:", books);
-        
-        const searchTerm = isAdmin ? document.getElementById("adminSearchInput").value : document.getElementById("userSearchInput").value;
-        const searchField = document.getElementById("userSearchField").value;
-        const practiceArea = document.getElementById("practiceAreaFilter").value;
-        const publicationYear = document.getElementById("publicationYearFilter").value;
-        const itemStatus = document.getElementById("itemStatusFilter").value;
+        function searchBooks(isAdmin = false) {
+            console.log("Search function called");
+            console.log("Current books in catalog:", books);
+            
+            const searchTerm = isAdmin ? document.getElementById("adminSearchInput").value : document.getElementById("userSearchInput").value;
+            const searchField = document.getElementById("userSearchField").value;
+            const practiceArea = document.getElementById("practiceAreaFilter").value;
+            const publicationYear = document.getElementById("publicationYearFilter").value;
+            const itemStatus = document.getElementById("itemStatusFilter").value;
 
-        showLoading(isAdmin);
+            showLoading(isAdmin);
 
-        setTimeout(() => {
-            let results = books.filter(book => {
-                let matchesSearch = true;
-                let matchesPracticeArea = true;
-                let matchesPublicationYear = true;
-                let matchesItemStatus = true;
+            setTimeout(() => {
+                let results = books.filter(book => {
+                    let matchesSearch = true;
+                    let matchesPracticeArea = true;
+                    let matchesPublicationYear = true;
+                    let matchesItemStatus = true;
 
-                if (searchTerm) {
-                    if (searchField === "all") {
-                        matchesSearch = Object.values(book).some(value => 
-                            value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-                        );
-                    } else {
-                        matchesSearch = book[searchField] && book[searchField].toString().toLowerCase().includes(searchTerm.toLowerCase());
-                    }
-                }
-
-                if (practiceArea) {
-                    matchesPracticeArea = book["Practice Area"] === practiceArea;
-                }
-
-                if (publicationYear) {
-                    matchesPublicationYear = book["Publication Year"] && book["Publication Year"].toString() === publicationYear;
-                }
-
-                if (itemStatus) {
-                    matchesItemStatus = book["Item Status"] === itemStatus;
-                }
-
-                return matchesSearch && matchesPracticeArea && matchesPublicationYear && matchesItemStatus;
-            });
-
-            const resultsContainer = isAdmin ? document.getElementById("adminResults") : document.getElementById("userResults");
-            resultsContainer.innerHTML = "";
-
-            if (results.length === 0) {
-                resultsContainer.innerHTML = "<p>No results found.</p>";
-            } else {
-                results.forEach((book, index) => {
-                    const bookElement = document.createElement("div");
-                    bookElement.className = "book-item glass";
-                    bookElement.innerHTML = `
-                        <h3>${book.Title || 'N/A'}</h3>
-                        <p><strong>Author:</strong> ${book.Author || 'N/A'}</p>
-                        <p><strong>Call Number:</strong> ${book["Call Number"] || 'N/A'}</p>
-                        <p><strong>Location:</strong> ${book["Collection Location"] || 'N/A'}</p>
-                        <p><strong>Status:</strong> ${book["Item Status"] || 'N/A'}</p>
-                        <p><strong>Practice Area:</strong> ${book["Practice Area"] || 'N/A'}</p>
-                        <p><strong>Publication Year:</strong> ${book["Publication Year"] || 'N/A'}</p>
-                        <p><strong>Copy:</strong> ${book.Copy || 'N/A'}</p>
-                    `;
-
-                    if (isAdmin) {
-                        const editButton = document.createElement("button");
-                        editButton.textContent = "Edit";
-                        editButton.onclick = () => editBook(index);
-                        bookElement.appendChild(editButton);
-
-                        const deleteButton = document.createElement("button");
-                        deleteButton.textContent = "Delete";
-                        deleteButton.onclick = () => deleteBook(index);
-                        bookElement.appendChild(deleteButton);
+                    if (searchTerm) {
+                        if (searchField === "all") {
+                            matchesSearch = Object.values(book).some(value => 
+                                value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+                            );
+                        } else {
+                            matchesSearch = book[searchField] && book[searchField].toString().toLowerCase().includes(searchTerm.toLowerCase());
+                        }
                     }
 
-                    resultsContainer.appendChild(bookElement);
+                    if (practiceArea) {
+                        matchesPracticeArea = book["Practice Area"] === practiceArea;
+                    }
+
+                    if (publicationYear) {
+                        matchesPublicationYear = book["Publication Year"] && book["Publication Year"].toString() === publicationYear;
+                    }
+
+                    if (itemStatus) {
+                        matchesItemStatus = book["Item Status"] === itemStatus;
+                    }
+
+                    return matchesSearch && matchesPracticeArea && matchesPublicationYear && matchesItemStatus;
                 });
+
+                const resultsContainer = isAdmin ? document.getElementById("adminResults") : document.getElementById("userResults");
+                resultsContainer.innerHTML = "";
+
+                if (results.length === 0) {
+                    resultsContainer.innerHTML = "<p>No results found.</p>";
+                } else {
+                    results.forEach((book, index) => {
+                        const bookElement = document.createElement("div");
+                        bookElement.className = "book-item glass";
+                        bookElement.innerHTML = `
+                            <h3>${book.Title || 'N/A'}</h3>
+                            <p><strong>Author:</strong> ${book.Author || 'N/A'}</p>
+                            <p><strong>Call Number:</strong> ${book["Call Number"] || 'N/A'}</p>
+                            <p><strong>Location:</strong> ${book["Collection Location"] || 'N/A'}</p>
+                            <p><strong>Status:</strong> ${book["Item Status"] || 'N/A'}</p>
+                            <p><strong>Practice Area:</strong> ${book["Practice Area"] || 'N/A'}</p>
+                            <p><strong>Publication Year:</strong> ${book["Publication Year"] || 'N/A'}</p>
+                            <p><strong>Copy:</strong> ${book.Copy || 'N/A'}</p>
+                        `;
+
+                        if (isAdmin) {
+                            const editButton = document.createElement("button");
+                            editButton.textContent = "Edit";
+                            editButton.onclick = () => editBook(index);
+                            bookElement.appendChild(editButton);
+
+                            const deleteButton = document.createElement("button");
+                            deleteButton.textContent = "Delete";
+                            deleteButton.onclick = () => deleteBook(index);
+                            bookElement.appendChild(deleteButton);
+                        }
+
+                        resultsContainer.appendChild(bookElement);
+                    });
+                }
+
+                hideLoading(isAdmin);
+            }, 500); // Simulating a delay for the loading animation
+        }
+
+        function addBook(event) {
+            event.preventDefault();
+            const newBook = {
+                "Title": document.getElementById("titleInput").value,
+                "Author": document.getElementById("authorInput").value,
+                "Call Number": document.getElementById("callNumberInput").value,
+                "Collection Location": document.getElementById("locationInput").value,
+                "Item Status": document.getElementById("statusInput").value,
+                "Practice Area": document.getElementById("practiceAreaInput").value,
+                "Publication Year": document.getElementById("publicationYearInput").value,
+                "Copy": document.getElementById("copyInput").value
+            };
+            books.push(newBook);
+            alert("Book added successfully!");
+            document.getElementById("addBookForm").reset();
+            updateFilterOptions();
+        }
+
+        function editBook(index) {
+            editingIndex = index;
+            const book = books[index];
+            document.getElementById("editTitleInput").value = book.Title || '';
+            document.getElementById("editAuthorInput").value = book.Author || '';
+            document.getElementById("editCallNumberInput").value = book["Call Number"] || '';
+            document.getElementById("editLocationInput").value = book["Collection Location"] || '';
+            document.getElementById("editStatusInput").value = book["Item Status"] || '';
+            document.getElementById("editPracticeAreaInput").value = book["Practice Area"] || '';
+            document.getElementById("editPublicationYearInput").value = book["Publication Year"] || '';
+            document.getElementById("editCopyInput").value = book.Copy || '';
+            document.getElementById("editModal").style.display = "block";
+        }
+
+        function deleteBook(index) {
+            if (confirm("Are you sure you want to delete this book?")) {
+                books.splice(index, 1);
+                searchBooks(true);
+                updateFilterOptions();
+            }
+        }
+
+        function saveEditedBook(event) {
+            event.preventDefault();
+            if (editingIndex === -1) return;
+            
+            books[editingIndex] = {
+                "Title": document.getElementById("editTitleInput").value,
+                "Author": document.getElementById("editAuthorInput").value,
+                "Call Number": document.getElementById("editCallNumberInput").value,
+                "Collection Location": document.getElementById("editLocationInput").value,
+                "Item Status": document.getElementById("editStatusInput").value,
+                "Practice Area": document.getElementById("editPracticeAreaInput").value,
+                "Publication Year": document.getElementById("editPublicationYearInput").value,
+                "Copy": document.getElementById("editCopyInput").value
+            };
+
+            alert("Book updated successfully!");
+            document.getElementById("editModal").style.display = "none";
+            searchBooks(true);
+            updateFilterOptions();
+            editingIndex = -1;
+        }
+
+        function bulkUpload() {
+            const fileInput = document.getElementById("bulkUploadInput");
+            const feedbackDiv = document.getElementById("uploadFeedback");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                feedbackDiv.innerHTML = "Please select a file to upload.";
+                return;
             }
 
-            hideLoading(isAdmin);
-        }, 500); // Simulating a delay for the loading animation
-    }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-    function addBook(event) {
-        event.preventDefault();
-        const newBook = {
-            "Title": document.getElementById("titleInput").value,
-            "Author": document.getElementById("authorInput").value,
-            "Call Number": document.getElementById("callNumberInput").value,
-            "Collection Location": document.getElementById("locationInput").value,
-            "Item Status": document.getElementById("statusInput").value,
-            "Practice Area": document.getElementById("practiceAreaInput").value,
-            "Publication Year": document.getElementById("publicationYearInput").value,
-            "Copy": document.getElementById("copyInput").value
-        };
-        books.push(newBook);
-        alert("Book added successfully!");
-        document.getElementById("addBookForm").reset();
-        updateFilterOptions();
-    }
+                let successCount = 0;
+                let errorCount = 0;
 
-    function editBook(index) {
-        editingIndex = index;
-        const book = books[index];
-        document.getElementById("editTitleInput").value = book.Title || '';
-        document.getElementById("editAuthorInput").value = book.Author || '';
-        document.getElementById("editCallNumberInput").value = book["Call Number"] || '';
-        document.getElementById("editLocationInput").value = book["Collection Location"] || '';
-        document.getElementById("editStatusInput").value = book["Item Status"] || '';
-        document.getElementById("editPracticeAreaInput").value = book["Practice Area"] || '';
-        document.getElementById("editPublicationYearInput").value = book["Publication Year"] || '';
-        document.getElementById("editCopyInput").value = book.Copy || '';
-        document.getElementById("editModal").style.display = "block";
-    }
+                jsonData.forEach(row => {
+                    if (validateBookData(row)) {
+                        books.push(row);
+                        successCount++;
+                    } else {
+                        errorCount++;
+                    }
+                });
 
-    function deleteBook(index) {
-        if (confirm("Are you sure you want to delete this book?")) {
-            books.splice(index, 1);
-            searchBooks(true);
-            updateFilterOptions();
-        }
-    }
-
-    function saveEditedBook(event) {
-        event.preventDefault();
-        if (editingIndex === -1) return;
-        
-        books[editingIndex] = {
-            "Title": document.getElementById("editTitleInput").value,
-            "Author": document.getElementById("editAuthorInput").value,
-            "Call Number": document.getElementById("editCallNumberInput").value,
-            "Collection Location": document.getElementById("editLocationInput").value,
-            "Item Status": document.getElementById("editStatusInput").value,
-            "Practice Area": document.getElementById("editPracticeAreaInput").value,
-            "Publication Year": document.getElementById("editPublicationYearInput").value,
-            "Copy": document.getElementById("editCopyInput").value
-        };
-
-        alert("Book updated successfully!");
-        document.getElementById("editModal").style.display = "none";
-        searchBooks(true);
-        updateFilterOptions();
-        editingIndex = -1;
-    }
-
-    function bulkUpload() {
-        const fileInput = document.getElementById("bulkUploadInput");
-        const feedbackDiv = document.getElementById("uploadFeedback");
-        const file = fileInput.files[0];
-
-        if (!file) {
-            feedbackDiv.innerHTML = "Please select a file to upload.";
-            return;
+                feedbackDiv.innerHTML = `Upload complete. ${successCount} books added successfully. ${errorCount} errors encountered.`;
+                searchBooks(true);
+                updateFilterOptions();
+            };
+            reader.readAsArrayBuffer(file);
         }
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, {type: 'array'});
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        function validateBookData(book) {
+            const requiredFields = ["Title", "Author", "Call Number", "Collection Location", "Item Status", "Practice Area", "Publication Year", "Copy"];
+            return requiredFields.every(field => book.hasOwnProperty(field) && book[field]);
+        }
 
-            let successCount = 0;
-            let errorCount = 0;
+        function exportCatalog() {
+            const worksheet = XLSX.utils.json_to_sheet(books);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Books");
+            XLSX.writeFile(workbook, "LexLiber_Catalog.xlsx");
+        }
 
-            jsonData.forEach(row => {
-                if (validateBookData(row)) {
-                    books.push(row);
-                    successCount++;
-                } else {
-                    errorCount++;
-                }
+        function updateFilterOptions() {
+            const practiceAreas = [...new Set(books.map(book => book["Practice Area"]))];
+            const publicationYears = [...new Set(books.map(book => book["Publication Year"]))];
+
+            const practiceAreaFilter = document.getElementById("practiceAreaFilter");
+            const publicationYearFilter = document.getElementById("publicationYearFilter");
+
+            practiceAreaFilter.innerHTML = '<option value="">Practice Areas</option>';
+            publicationYearFilter.innerHTML = '<option value="">Years</option>';
+
+            practiceAreas.forEach(area => {
+                if (area) practiceAreaFilter.innerHTML += `<option value="${area}">${area}</option>`;
             });
 
-            feedbackDiv.innerHTML = `Upload complete. ${successCount} books added successfully. ${errorCount} errors encountered.`;
-            searchBooks(true);
+            publicationYears.forEach(year => {
+                if (year) publicationYearFilter.innerHTML += `<option value="${year}">${year}</option>`;
+            });
+        }
+
+        function showLoading(isAdmin) {
+            const loadingElement = isAdmin ? document.getElementById("adminLoading") : document.getElementById("userLoading");
+            loadingElement.style.display = "block";
+        }
+
+        function hideLoading(isAdmin) {
+            const loadingElement = isAdmin ? document.getElementById("adminLoading") : document.getElementById("userLoading");
+            loadingElement.style.display = "none";
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        async function init() {
+            console.log("Initializing...");
+            books = await fetchBookData();
             updateFilterOptions();
-        };
-        reader.readAsArrayBuffer(file);
-    }
 
-    function validateBookData(book) {
-        const requiredFields = ["Title", "Author", "Call Number", "Collection Location", "Item Status", "Practice Area", "Publication Year", "Copy"];
-        return requiredFields.every(field => book.hasOwnProperty(field) && book[field]);
-    }
+            const userSearchButton = document.getElementById("userSearchButton");
+            const adminSearchButton = document.getElementById("adminSearchButton");
+            const adminIcon = document.getElementById("adminIcon");
+            const addBookForm = document.getElementById("addBookForm");
+            const editBookForm = document.getElementById("editBookForm");
+            const bulkUploadButton = document.getElementById("bulkUploadButton");
+            const exportButton = document.getElementById("exportButton");
+            const modal = document.getElementById("editModal");
+            const closeButton = modal.querySelector(".close");
+            const themeToggle = document.getElementById("themeToggle");
+            
+            if (userSearchButton) {
+                userSearchButton.addEventListener("click", () => searchBooks(false));
+                console.log("User search button listener added");
+            }
 
-    function exportCatalog() {
-        const worksheet = XLSX.utils.json_to_sheet(books);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Books");
-        XLSX.writeFile(workbook, "LexLiber_Catalog.xlsx");
-    }
+            if (adminSearchButton) {
+                adminSearchButton.addEventListener("click", () => searchBooks(true));
+                console.log("Admin search button listener added");
+            }
 
-    function updateFilterOptions() {
-        const practiceAreas = [...new Set(books.map(book => book["Practice Area"]))];
-        const publicationYears = [...new Set(books.map(book => book["Publication Year"]))];
+            if (adminIcon) {
+                adminIcon.addEventListener("click", toggleInterface);
+                console.log("Admin icon listener added");
+            }
 
-        const practiceAreaFilter = document.getElementById("practiceAreaFilter");
-        const publicationYearFilter = document.getElementById("publicationYearFilter");
+            if (addBookForm) {
+                addBookForm.addEventListener("submit", addBook);
+                console.log("Add book form listener added");
+            }
 
-        practiceAreaFilter.innerHTML = '<option value="">Practice Areas</option>';
-        publicationYearFilter.innerHTML = '<option value="">Years</option>';
+            if (editBookForm) {
+                editBookForm.addEventListener("submit", saveEditedBook);
+                console.log("Edit book form listener added");
+            }
 
-        practiceAreas.forEach(area => {
-            if (area) practiceAreaFilter.innerHTML += `<option value="${area}">${area}</option>`;
-        });
+            if (bulkUploadButton) {
+                bulkUploadButton.addEventListener("click", bulkUpload);
+                console.log("Bulk upload button listener added");
+            }
 
-        publicationYears.forEach(year => {
-            if (year) publicationYearFilter.innerHTML += `<option value="${year}">${year}</option>`;
-        });
-    }
+            if (exportButton) {
+                exportButton.addEventListener("click", exportCatalog);
+                console.log("Export button listener added");
+            }
 
-    function showLoading(isAdmin) {
-        const loadingElement = isAdmin ? document.getElementById("adminLoading") : document.getElementById("userLoading");
-        loadingElement.style.display = "block";
-    }
+            if (themeToggle) {
+                themeToggle.addEventListener("click", toggleDarkMode);
+                console.log("Theme toggle listener added");
+            }
 
-    function hideLoading(isAdmin) {
-        const loadingElement = isAdmin ? document.getElementById("adminLoading") : document.getElementById("userLoading");
-        loadingElement.style.display = "none";
-    }
-
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-    }
-
-    async function init() {
-        console.log("Initializing...");
-        books = await fetchBookData();
-        updateFilterOptions();
-
-        const userSearchButton = document.getElementById("userSearchButton");
-        const adminSearchButton = document.getElementById("adminSearchButton");
-        const adminIcon = document.getElementById("adminIcon");
-        const addBookForm = document.getElementById("addBookForm");
-        const editBookForm = document.getElementById("editBookForm");
-        const bulkUploadButton = document.getElementById("bulkUploadButton");
-        const exportButton = document.getElementById("exportButton");
-        const modal = document.getElementById("editModal");
-        const closeButton = modal.querySelector(".close");
-        const themeToggle = document.getElementById("themeToggle");
-        
-        if (userSearchButton) {
-            userSearchButton.addEventListener("click", () => searchBooks(false));
-            console.log("User search button listener added");
-        }
-
-        if (adminSearchButton) {
-            adminSearchButton.addEventListener("click", () => searchBooks(true));
-            console.log("Admin search button listener added");
-        }
-
-        if (adminIcon) {
-            adminIcon.addEventListener("click", toggleInterface);
-            console.log("Admin icon listener added");
-        }
-
-        if (addBookForm) {
-            addBookForm.addEventListener("submit", addBook);
-            console.log("Add book form listener added");
-        }
-
-        if (editBookForm) {
-            editBookForm.addEventListener("submit", saveEditedBook);
-            console.log("Edit book form listener added");
-        }
-
-        if (bulkUploadButton) {
-            bulkUploadButton.addEventListener("click", bulkUpload);
-            console.log("Bulk upload button listener added");
-        }
-
-        if (exportButton) {
-            exportButton.addEventListener("click", exportCatalog);
-            console.log("Export button listener added");
-        }
-
-        if (themeToggle) {
-            themeToggle.addEventListener("click", toggleDarkMode);
-            console.log("Theme toggle listener added");
-        }
-
-        closeButton.onclick = function() {
-            modal.style.display = "none";
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modal) {
+            closeButton.onclick = function() {
                 modal.style.display = "none";
             }
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
         }
-    }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        init().catch(error => console.error("Initialization error:", error));
-    });
+        document.addEventListener('DOMContentLoaded', () => {
+            init().catch(error => console.error("Initialization error:", error));
+        });
 
-    console.log("Script finished");
+        console.log("Script finished");
     </script>
 </body>
 </html>
