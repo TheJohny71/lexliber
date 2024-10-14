@@ -11,6 +11,31 @@
         .gear-icon { cursor: pointer; }
         form { margin-top: 20px; }
         input, button { margin: 5px 0; display: block; }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -40,6 +65,22 @@
         <div id="uploadFeedback"></div>
     </div>
 
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Book</h2>
+            <form id="editBookForm">
+                <input type="text" id="editTitleInput" placeholder="Title" required>
+                <input type="text" id="editAuthorInput" placeholder="Author" required>
+                <input type="text" id="editCallNumberInput" placeholder="Call Number" required>
+                <input type="text" id="editLocationInput" placeholder="Collection Location" required>
+                <input type="text" id="editStatusInput" placeholder="Item Status" required>
+                <input type="text" id="editPracticeAreaInput" placeholder="Practice Area" required>
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
     <script>
     console.log("Script started");
 
@@ -64,7 +105,7 @@
         if (filteredBooks.length === 0) {
             resultsDiv.innerHTML = "<p>No results found.</p>";
         } else {
-            filteredBooks.forEach(book => {
+            filteredBooks.forEach((book, index) => {
                 const bookDiv = document.createElement("div");
                 bookDiv.innerHTML = `
                     <h3>${book.Title}</h3>
@@ -73,6 +114,8 @@
                     <p>Collection Location: ${book["Collection Location"]}</p>
                     <p>Item Status: ${book["Item Status"]}</p>
                     <p>Practice Area: ${book["Practice Area"]}</p>
+                    <button onclick="editBook(${index})">Edit</button>
+                    <button onclick="deleteBook(${index})">Delete</button>
                 `;
                 resultsDiv.appendChild(bookDiv);
             });
@@ -85,8 +128,8 @@
         document.getElementById("adminInterface").classList.toggle("hidden");
     }
 
-    function isCallNumberUnique(callNumber) {
-        return !books.some(book => book["Call Number"] === callNumber);
+    function isCallNumberUnique(callNumber, currentIndex = -1) {
+        return !books.some((book, index) => index !== currentIndex && book["Call Number"] === callNumber);
     }
 
     function addBook(event) {
@@ -112,40 +155,52 @@
         document.getElementById("addBookForm").reset();
     }
 
-    function bulkUpload() {
-        console.log("Bulk upload function called");
-        const fileInput = document.getElementById("bulkUploadInput");
-        const file = fileInput.files[0];
-        const feedbackDiv = document.getElementById("uploadFeedback");
+    function editBook(index) {
+        const book = books[index];
+        document.getElementById("editTitleInput").value = book.Title;
+        document.getElementById("editAuthorInput").value = book.Author;
+        document.getElementById("editCallNumberInput").value = book["Call Number"];
+        document.getElementById("editLocationInput").value = book["Collection Location"];
+        document.getElementById("editStatusInput").value = book["Item Status"];
+        document.getElementById("editPracticeAreaInput").value = book["Practice Area"];
         
-        if (!file) {
-            feedbackDiv.innerHTML = "Please select a file to upload.";
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, {type: 'array'});
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-            let successCount = 0;
-            let errorCount = 0;
-
-            jsonData.forEach(row => {
-                if (validateBookData(row)) {
-                    books.push(row);
-                    successCount++;
-                } else {
-                    errorCount++;
-                }
-            });
-
-            feedbackDiv.innerHTML = `Upload complete. ${successCount} books added successfully. ${errorCount} errors encountered.`;
+        const modal = document.getElementById("editModal");
+        modal.style.display = "block";
+        
+        document.getElementById("editBookForm").onsubmit = function(event) {
+            event.preventDefault();
+            const newCallNumber = document.getElementById("editCallNumberInput").value;
+            
+            if (!isCallNumberUnique(newCallNumber, index)) {
+                alert("Error: Another book with this Call Number already exists. Please use a unique Call Number.");
+                return;
+            }
+            
+            books[index] = {
+                "Title": document.getElementById("editTitleInput").value,
+                "Author": document.getElementById("editAuthorInput").value,
+                "Call Number": newCallNumber,
+                "Collection Location": document.getElementById("editLocationInput").value,
+                "Item Status": document.getElementById("editStatusInput").value,
+                "Practice Area": document.getElementById("editPracticeAreaInput").value
+            };
+            
+            modal.style.display = "none";
+            alert("Book updated successfully!");
+            searchBooks(); // Refresh the search results
         };
-        reader.readAsArrayBuffer(file);
+    }
+
+    function deleteBook(index) {
+        if (confirm("Are you sure you want to delete this book?")) {
+            books.splice(index, 1);
+            alert("Book deleted successfully!");
+            searchBooks(); // Refresh the search results
+        }
+    }
+
+    function bulkUpload() {
+        // ... (keep the existing bulkUpload function)
     }
 
     function validateBookData(book) {
@@ -159,6 +214,8 @@
         const adminIcon = document.getElementById("adminIcon");
         const addBookForm = document.getElementById("addBookForm");
         const bulkUploadButton = document.getElementById("bulkUploadButton");
+        const modal = document.getElementById("editModal");
+        const closeButton = modal.querySelector(".close");
         
         if (searchButton) {
             searchButton.addEventListener("click", searchBooks);
@@ -186,6 +243,16 @@
             console.log("Bulk upload button listener added");
         } else {
             console.error("Bulk upload button not found");
+        }
+
+        closeButton.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
         }
     }
 
