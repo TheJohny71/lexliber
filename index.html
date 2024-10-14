@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LexLiber</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <style>
         .hidden { display: none; }
         .gear-icon { cursor: pointer; }
@@ -33,6 +34,10 @@
             <input type="text" id="practiceAreaInput" placeholder="Practice Area" required>
             <button type="submit">Add Book</button>
         </form>
+        <h3>Bulk Upload</h3>
+        <input type="file" id="bulkUploadInput" accept=".xlsx,.xls,.csv">
+        <button id="bulkUploadButton">Upload File</button>
+        <div id="uploadFeedback"></div>
     </div>
 
     <script>
@@ -40,7 +45,8 @@
 
     let books = [
         { "Title": "Sample Book 1", "Author": "John Doe", "Call Number": "ABC123", "Collection Location": "Main Library", "Item Status": "Available", "Practice Area": "General Law" },
-        { "Title": "Sample Book 2", "Author": "Jane Smith", "Call Number": "XYZ789", "Collection Location": "Law Library", "Item Status": "Checked Out", "Practice Area": "Criminal Law" }
+        { "Title": "Sample Book 2", "Author": "Jane Smith", "Call Number": "XYZ789", "Collection Location": "Law Library", "Item Status": "Checked Out", "Practice Area": "Criminal Law" },
+        { "Title": "Contract", "Author": "JD", "Call Number": "123", "Collection Location": "stack", "Item Status": "checked out", "Practice Area": "transactions" }
     ];
 
     function searchBooks() {
@@ -95,11 +101,53 @@
         document.getElementById("addBookForm").reset();
     }
 
+    function bulkUpload() {
+        console.log("Bulk upload function called");
+        const fileInput = document.getElementById("bulkUploadInput");
+        const file = fileInput.files[0];
+        const feedbackDiv = document.getElementById("uploadFeedback");
+        
+        if (!file) {
+            feedbackDiv.innerHTML = "Please select a file to upload.";
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            jsonData.forEach(row => {
+                if (validateBookData(row)) {
+                    books.push(row);
+                    successCount++;
+                } else {
+                    errorCount++;
+                }
+            });
+
+            feedbackDiv.innerHTML = `Upload complete. ${successCount} books added successfully. ${errorCount} errors encountered.`;
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function validateBookData(book) {
+        const requiredFields = ["Title", "Author", "Call Number", "Collection Location", "Item Status", "Practice Area"];
+        return requiredFields.every(field => book.hasOwnProperty(field) && book[field]);
+    }
+
     function init() {
         console.log("Initializing...");
         const searchButton = document.getElementById("searchButton");
         const adminIcon = document.getElementById("adminIcon");
         const addBookForm = document.getElementById("addBookForm");
+        const bulkUploadButton = document.getElementById("bulkUploadButton");
         
         if (searchButton) {
             searchButton.addEventListener("click", searchBooks);
@@ -120,6 +168,13 @@
             console.log("Add book form listener added");
         } else {
             console.error("Add book form not found");
+        }
+
+        if (bulkUploadButton) {
+            bulkUploadButton.addEventListener("click", bulkUpload);
+            console.log("Bulk upload button listener added");
+        } else {
+            console.error("Bulk upload button not found");
         }
     }
 
