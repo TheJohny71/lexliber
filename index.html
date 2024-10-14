@@ -7,10 +7,57 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
         .hidden { display: none; }
-        .gear-icon { cursor: pointer; }
-        form { margin-top: 20px; }
-        input, button { margin: 5px 0; display: block; }
+        .gear-icon { 
+            cursor: pointer;
+            font-size: 24px;
+            color: #007bff;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2, h3 {
+            color: #0056b3;
+        }
+        form { 
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        input, button { 
+            margin: 10px 0;
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
         .modal {
             display: none;
             position: fixed;
@@ -28,6 +75,9 @@
             padding: 20px;
             border: 1px solid #888;
             width: 80%;
+            max-width: 500px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .close {
             color: #aaa;
@@ -35,6 +85,38 @@
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
+        }
+        .close:hover {
+            color: #000;
+        }
+        #userResults, #adminResults {
+            margin-top: 20px;
+        }
+        .book-item {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .book-item h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .book-item p {
+            margin: 5px 0;
+        }
+        .book-item button {
+            display: inline-block;
+            width: auto;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        #uploadFeedback {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -51,6 +133,7 @@
     <div id="adminInterface" class="hidden">
         <h2>Admin Interface</h2>
         <form id="addBookForm">
+            <h3>Add New Book</h3>
             <input type="text" id="titleInput" placeholder="Title" required>
             <input type="text" id="authorInput" placeholder="Author" required>
             <input type="text" id="callNumberInput" placeholder="Call Number" required>
@@ -115,6 +198,7 @@
         } else {
             filteredBooks.forEach((book, index) => {
                 const bookDiv = document.createElement("div");
+                bookDiv.className = "book-item";
                 bookDiv.innerHTML = `
                     <h3>${book.Title}</h3>
                     <p>Author: ${book.Author}</p>
