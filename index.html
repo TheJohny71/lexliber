@@ -112,7 +112,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script>
-    alert("JavaScript is running");
+    console.log("Script started");
 
     let books = [
         {
@@ -132,31 +132,23 @@
             "Practice Area": "Criminal Law"
         }
     ];
-    console.log("Initial books data:", books);
 
     function searchBooks() {
-        alert("searchBooks function called");
+        console.log("searchBooks function called");
         const searchTerm = document.getElementById("searchInput").value.toLowerCase();
         const searchType = document.getElementById("searchType").value;
         const resultsDiv = document.getElementById("results");
         resultsDiv.innerHTML = "";
 
-        console.log('Searching for:', searchTerm);
-        console.log('Search type:', searchType);
-        console.log('Current books data:', books);
+        console.log('Searching for:', searchTerm, 'in', searchType);
 
         const filteredBooks = books.filter(book => {
             if (searchType === "all") {
-                return Object.values(book).some(value => {
-                    const result = String(value).toLowerCase().includes(searchTerm);
-                    console.log(`Checking ${value}: ${result}`);
-                    return result;
-                });
+                return Object.values(book).some(value => 
+                    String(value).toLowerCase().includes(searchTerm)
+                );
             } else {
-                console.log('Searching in field:', searchType);
-                const result = String(book[searchType]).toLowerCase().includes(searchTerm);
-                console.log(`Checking ${book[searchType]}: ${result}`);
-                return result;
+                return String(book[searchType]).toLowerCase().includes(searchTerm);
             }
         });
 
@@ -169,57 +161,4 @@
                 const bookDiv = document.createElement("div");
                 bookDiv.className = "book-item";
                 bookDiv.innerHTML = `
-                    <h3>${book["Title"]}</h3>
-                    <p>Author: ${book["Author"]}</p>
-                    <p>Call Number: ${book["Call Number"]}</p>
-                    <p>Collection Location: ${book["Collection Location"]}</p>
-                    <p>Item Status: ${book["Item Status"]}</p>
-                    <p>Practice Area: ${book["Practice Area"]}</p>
-                `;
-                resultsDiv.appendChild(bookDiv);
-            });
-        }
-    }
-
-    function addBook(event) {
-        event.preventDefault();
-        const newBook = {
-            "Title": document.getElementById("titleInput").value,
-            "Author": document.getElementById("authorInput").value,
-            "Call Number": document.getElementById("callNumberInput").value,
-            "Collection Location": document.getElementById("locationInput").value,
-            "Item Status": document.getElementById("statusInput").value,
-            "Practice Area": document.getElementById("practiceAreaInput").value
-        };
-        books.push(newBook);
-        alert("Book added successfully!");
-        document.getElementById("addBookForm").reset();
-    }
-
-    function bulkUpload() {
-        alert("Bulk upload functionality not implemented in this test version");
-    }
-
-    function toggleInterface() {
-        document.getElementById("userInterface").classList.toggle("hidden");
-        document.getElementById("adminInterface").classList.toggle("hidden");
-    }
-
-    function init() {
-        console.log("Initializing...");
-        const searchButton = document.getElementById("searchButton");
-        if (searchButton) {
-            searchButton.addEventListener("click", function() {
-                alert("Search button clicked");
-                searchBooks();
-            });
-            console.log("Search button listener added");
-        } else {
-            console.error("Search button not found");
-        }
-    }
-
-    init();
-    </script>
-</body>
-</html>
+                    <h3>${book["
