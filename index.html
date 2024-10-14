@@ -4,15 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LexLiber Catalog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-green: #00a68e;
+            --charcoal: #000000;
+            --gray-1: #f7f7f7;
+            --white: #ffffff;
+            --black: #000000;
+            --violet: #7379b9;
+            --coral: #f27557;
+            --blue: #278bcb;
+            --gray-2: #c7c7c7;
+            --chartreuse: #cad23b;
+        }
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
+            font-family: 'Roboto', sans-serif; /* Placeholder for Euclid Flex B */
+            background-color: var(--gray-1);
             margin: 0;
             padding: 20px;
+            color: var(--charcoal);
         }
         .container {
-            background-color: white;
+            background-color: var(--white);
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -20,26 +34,39 @@
             margin: 0 auto;
         }
         h1 {
-            color: #333;
+            color: var(--primary-green);
             text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
         }
         #searchInput {
             width: 100%;
             padding: 10px;
             font-size: 16px;
             margin-bottom: 20px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--gray-2);
             border-radius: 4px;
+            box-sizing: border-box;
         }
         .book {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
+            background-color: var(--gray-1);
+            border: 1px solid var(--gray-2);
+            padding: 15px;
+            margin-bottom: 15px;
             border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .book:hover {
+            background-color: var(--chartreuse);
         }
         .book h3 {
             margin-top: 0;
-            color: #2c3e50;
+            color: var(--blue);
+            font-size: 1.2em;
+        }
+        .book p {
+            margin: 5px 0;
+            color: var(--charcoal);
         }
         .logo {
             display: block;
@@ -52,7 +79,7 @@
     <div class="container">
         <img src="lexliber-logo.png.jpg" alt="LexLiber Logo" class="logo">
         <h1>LexLiber Catalog</h1>
-        <input type="text" id="searchInput" placeholder="Search books...">
+        <input type="text" id="searchInput" placeholder="Search by title, call number, author, or keyword...">
         <div id="results"></div>
     </div>
 
@@ -86,6 +113,7 @@
                 bookElement.className = 'book';
                 bookElement.innerHTML = `
                     <h3>${book.Title || 'No Title'}</h3>
+                    <p>Author: ${book.Author || 'N/A'}</p>
                     <p>Call Number: ${book["Call No."] || 'N/A'}</p>
                     <p>Status: ${book["Item Status"] || 'N/A'}</p>
                     <p>Location: ${book["Collection Location"] || 'N/A'}</p>
