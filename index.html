@@ -316,18 +316,34 @@
     </div>
 
     <script>
-    console.log("Script started");
-
-    let books = [
-        { "Title": "Sample Book 1", "Author": "John Doe", "Call Number": "ABC123", "Collection Location": "Main Library", "Item Status": "Available", "Practice Area": "General Law", "Publication Year": "2020", "Copy": "1" },
-        { "Title": "Sample Book 2", "Author": "Jane Smith", "Call Number": "XYZ789", "Collection Location": "Law Library", "Item Status": "Checked Out", "Practice Area": "Criminal Law", "Publication Year": "2019", "Copy": "2" },
-        { "Title": "Contract Law Basics", "Author": "Alice Johnson", "Call Number": "CON456", "Collection Location": "Main Library", "Item Status": "Available", "Practice Area": "Contract Law", "Publication Year": "2021", "Copy": "1" }
-    ];
-
+    let books = [];
     let editingIndex = -1;
+
+    async function fetchBookData() {
+        try {
+            const response = await fetch('Sheet1 (2).json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log("Fetched book data:", data);
+            return data;
+        } catch (error) {
+            console.error("Could not fetch book data:", error);
+            return [];
+        }
+    }
+
+    function toggleInterface() {
+        const userInterface = document.getElementById("userInterface");
+        const adminInterface = document.getElementById("adminInterface");
+        userInterface.classList.toggle("hidden");
+        adminInterface.classList.toggle("hidden");
+    }
 
     function searchBooks(isAdmin = false) {
         console.log("Search function called");
+        console.log("Current books in catalog:", books);
         const searchTerm = isAdmin 
             ? document.getElementById("adminSearchInput").value.toLowerCase()
             : document.getElementById("userSearchInput").value.toLowerCase();
@@ -371,29 +387,23 @@
                 bookDiv.className = "book-item";
                 bookDiv.innerHTML = `
                     <h3>${book.Title}</h3>
-                    <p>Author: ${book.Author}</p>
-                    <p>Call Number: ${book["Call Number"]}</p>
-                    <p>Collection Location: ${book["Collection Location"]}</p>
-                    <p>Item Status: ${book["Item Status"]}</p>
-                    <p>Practice Area: ${book["Practice Area"]}</p>
-                    <p>Publication Year: ${book["Publication Year"]}</p>
-                    <p>Copy: ${book["Copy"]}</p>
+                    <p><strong>Author:</strong> ${book.Author}</p>
+                    <p><strong>Call Number:</strong> ${book["Call Number"]}</p>
+                    <p><strong>Collection Location:</strong> ${book["Collection Location"]}</p>
+                    <p><strong>Item Status:</strong> ${book["Item Status"]}</p>
+                    <p><strong>Practice Area:</strong> ${book["Practice Area"]}</p>
+                    <p><strong>Publication Year:</strong> ${book["Publication Year"]}</p>
+                    <p><strong>Copy:</strong> ${book["Copy"]}</p>
                 `;
                 if (isAdmin) {
                     bookDiv.innerHTML += `
-                        <button onclick="editBook(${books.indexOf(book)})">Edit</button>
-                        <button onclick="deleteBook(${books.indexOf(book)})">Delete</button>
+                        <button onclick="editBook(${index})">Edit</button>
+                        <button onclick="deleteBook(${index})">Delete</button>
                     `;
                 }
                 resultsDiv.appendChild(bookDiv);
             });
         }
-    }
-
-    function toggleInterface() {
-        console.log("Toggle interface called");
-        document.getElementById("userInterface").classList.toggle("hidden");
-        document.getElementById("adminInterface").classList.toggle("hidden");
     }
 
     function addBook(event) {
@@ -527,8 +537,11 @@
         });
     }
 
-    function init() {
+    async function init() {
         console.log("Initializing...");
+        books = await fetchBookData();
+        updateFilterOptions();
+
         const userSearchButton = document.getElementById("userSearchButton");
         const adminSearchButton = document.getElementById("adminSearchButton");
         const adminIcon = document.getElementById("adminIcon");
@@ -583,11 +596,11 @@
                 modal.style.display = "none";
             }
         }
-
-        updateFilterOptions();
     }
 
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', () => {
+        init().catch(error => console.error("Initialization error:", error));
+    });
 
     console.log("Script finished");
     </script>
