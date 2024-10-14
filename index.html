@@ -206,11 +206,19 @@
             document.getElementById("bulkUploadButton").addEventListener("click", bulkUpload);
         }
 
-        if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", init);
-        } else {
-            init();
-        }
+        // Use 'DOMContentLoaded' instead of 'load' event
+        document.addEventListener("DOMContentLoaded", init);
+
+        // Use 'visibilitychange' instead of 'unload'
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Page is hidden, perform any necessary cleanup
+                console.log('Page is hidden');
+            } else {
+                // Page is visible again
+                console.log('Page is visible');
+            }
+        });
     </script>
 </body>
 </html>
