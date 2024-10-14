@@ -7,22 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <style>
-        @font-face {
-            font-family: 'Euclid Flex B';
-            src: url('path/to/EuclidFlexB-Regular.woff2') format('woff2'),
-                 url('path/to/EuclidFlexB-Regular.woff') format('woff');
-            font-weight: normal;
-            font-style: normal;
-        }
-
-        @font-face {
-            font-family: 'Stanley';
-            src: url('path/to/Stanley-Regular.woff2') format('woff2'),
-                 url('path/to/Stanley-Regular.woff') format('woff');
-            font-weight: normal;
-            font-style: normal;
-        }
-
         :root {
             --primary-green: #00a68e;
             --primary-charcoal: #000000;
@@ -50,7 +34,7 @@
         }
 
         body {
-            font-family: 'Euclid Flex B', Arial, sans-serif;
+            font-family: Arial, sans-serif;
             font-size: var(--font-size-medium);
             line-height: 1.6;
             color: var(--text-color);
@@ -58,6 +42,11 @@
             margin: 0;
             padding: 0;
             transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        h1, h2, h3 {
+            font-family: Georgia, serif;
+            color: var(--primary-green);
         }
 
         .dark-mode {
@@ -82,11 +71,6 @@
             position: absolute;
             top: 20px;
             right: 20px;
-        }
-
-        h1, h2, h3 {
-            font-family: 'Stanley', serif;
-            color: var(--primary-green);
         }
 
         h1 {
@@ -198,34 +182,13 @@
             box-shadow: var(--box-shadow);
         }
 
-        .book-item h3 {
-            margin-top: 0;
-            color: var(--primary-green);
+        .glass {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .book-item p {
-            margin: var(--spacing-small) 0;
-        }
-
-        .book-item button {
-            display: inline-block;
-            width: auto;
-            margin-right: var(--spacing-small);
-        }
-
-        .filter-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--spacing-small);
-            margin-bottom: var(--spacing-medium);
-        }
-
-        .filter-container select {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        /* Animated search bar */
         #userSearchInput, #adminSearchInput {
             width: 200px;
             transition: width 0.3s ease-in-out;
@@ -235,92 +198,66 @@
             width: 300px;
         }
 
-        /* Custom loading animation */
-        @keyframes pageFlip {
-            0% { transform: rotateY(0deg); }
-            100% { transform: rotateY(180deg); }
-        }
-
         .loading {
+            display: none;
             width: 50px;
             height: 50px;
-            background-color: var(--primary-green);
-            animation: pageFlip 1s infinite;
+            border: 3px solid var(--secondary-gray);
+            border-top: 3px solid var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
             margin: 20px auto;
-            display: none;
         }
 
-        /* Glassmorphism */
-        .glass {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(8px);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        /* Dark mode toggle */
-        .theme-toggle {
-            position: absolute;
+        #themeToggle {
+            position: fixed;
             top: 20px;
             right: 60px;
-            cursor: pointer;
-            font-size: 24px;
+            background: none;
+            border: none;
             color: var(--primary-green);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: var(--spacing-small);
-            }
-            
-            input, select, button {
-                width: 100%;
-                margin-bottom: var(--spacing-small);
-            }
-
-            .filter-container {
-                flex-direction: column;
-            }
+            font-size: 24px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>LexLiber</h1>
-        <i class="fas fa-cog gear-icon" id="adminIcon"></i>
-        <i class="fas fa-adjust theme-toggle" id="themeToggle"></i>
-        
-        <div id="userInterface" class="card glass">
-            <div class="filter-container">
+        <button id="themeToggle"><i class="fas fa-adjust"></i></button>
+        <i id="adminIcon" class="fas fa-cog gear-icon"></i>
+
+        <div id="userInterface">
+            <div class="card">
                 <select id="userSearchField">
                     <option value="all">Search By</option>
                     <option value="Title">Title</option>
                     <option value="Author">Author</option>
                     <option value="Call Number">Call Number</option>
-                    <option value="Practice Area">Practice Area</option>
+                    <option value="Collection Location">Collection Location</option>
                 </select>
-                <select id="practiceAreaFilter">
-                    <option value="">Practice Areas</option>
-                    <!-- Add practice area options dynamically -->
-                </select>
-                <select id="publicationYearFilter">
-                    <option value="">Years</option>
-                    <!-- Add year options dynamically -->
-                </select>
+                <input type="text" id="userSearchInput" placeholder="Enter search term...">
+                <select id="practiceAreaFilter"></select>
+                <select id="publicationYearFilter"></select>
                 <select id="itemStatusFilter">
                     <option value="">Status</option>
                     <option value="Available">Available</option>
                     <option value="Checked Out">Checked Out</option>
+                    <option value="On Hold">On Hold</option>
                 </select>
+                <button id="userSearchButton">Search</button>
             </div>
-            <input type="text" id="userSearchInput" placeholder="Enter search term...">
-            <button id="userSearchButton">Search</button>
-            <div class="loading" id="userLoading"></div>
+            <div id="userLoading" class="loading"></div>
             <div id="userResults"></div>
         </div>
 
         <div id="adminInterface" class="hidden">
-            <div class="card glass">
+            <div class="card">
                 <h2>Admin Interface</h2>
                 <form id="addBookForm">
                     <h3>Add New Book</h3>
@@ -335,24 +272,24 @@
                     <button type="submit">Add Book</button>
                 </form>
             </div>
-            <div class="card glass">
+            <div class="card">
                 <h3>Bulk Upload</h3>
                 <input type="file" id="bulkUploadInput" accept=".xlsx,.xls,.csv">
                 <button id="bulkUploadButton">Upload File</button>
                 <div id="uploadFeedback"></div>
             </div>
-            <div class="card glass">
+            <div class="card">
                 <h3>Manage Books</h3>
                 <button id="exportButton" class="button-secondary">Export Catalog</button>
                 <input type="text" id="adminSearchInput" placeholder="Search books...">
                 <button id="adminSearchButton">Search</button>
-                <div class="loading" id="adminLoading"></div>
+                <div id="adminLoading" class="loading"></div>
                 <div id="adminResults"></div>
             </div>
         </div>
 
         <div id="editModal" class="modal">
-            <div class="modal-content glass">
+            <div class="modal-content">
                 <span class="close">&times;</span>
                 <h2>Edit Book</h2>
                 <form id="editBookForm">
@@ -389,70 +326,95 @@
         }
     }
 
-    function searchBooks(isAdmin = false) {
-        console.log("Search function called");
-        console.log("Current books in catalog:", books);
-        const searchTerm = isAdmin 
-            ? document.getElementById("adminSearchInput").value.toLowerCase()
-            : document.getElementById("userSearchInput").value.toLowerCase();
-        const searchField = document.getElementById("userSearchField").value;
-        const practiceArea = document.getElementById("practiceAreaFilter").value;
-        const publicationYear = document.getElementById("publicationYearFilter").value;
-        const itemStatus = document.getElementById("itemStatusFilter").value;
-        
-        showLoading(isAdmin);
-
-        const results = books.filter(book => {
-            const fieldMatch = searchField === "all" 
-                ? Object.values(book).some(value => value.toString().toLowerCase().includes(searchTerm))
-                : book[searchField].toString().toLowerCase().includes(searchTerm);
-            const practiceAreaMatch = practiceArea === "" || book["Practice Area"] === practiceArea;
-            const publicationYearMatch = publicationYear === "" || book["Publication Year"].toString() === publicationYear;
-            const itemStatusMatch = itemStatus === "" || book["Item Status"] === itemStatus;
-            return fieldMatch && practiceAreaMatch && publicationYearMatch && itemStatusMatch;
-        });
-
-        setTimeout(() => {
-            displayResults(results, isAdmin);
-            hideLoading(isAdmin);
-        }, 500); // Simulating a delay for the loading animation
-    }
-
-    function displayResults(results, isAdmin) {
-        const resultsContainer = isAdmin ? document.getElementById("adminResults") : document.getElementById("userResults");
-        resultsContainer.innerHTML = "";
-        if (results.length === 0) {
-            resultsContainer.innerHTML = "<p>No results found.</p>";
-            return;
-        }
-        results.forEach((book, index) => {
-            const bookElement = document.createElement("div");
-            bookElement.className = "book-item glass";
-            bookElement.innerHTML = `
-                <h3>${book.Title}</h3>
-                <p><strong>Author:</strong> ${book.Author}</p>
-                <p><strong>Call Number:</strong> ${book["Call Number"]}</p>
-                <p><strong>Location:</strong> ${book["Collection Location"]}</p>
-                <p><strong>Status:</strong> ${book["Item Status"]}</p>
-                <p><strong>Practice Area:</strong> ${book["Practice Area"]}</p>
-                <p><strong>Publication Year:</strong> ${book["Publication Year"]}</p>
-                <p><strong>Copy:</strong> ${book["Copy"]}</p>
-            `;
-            if (isAdmin) {
-                bookElement.innerHTML += `
-                    <button onclick="editBook(${index})">Edit</button>
-                    <button onclick="deleteBook(${index})">Delete</button>
-                `;
-            }
-            resultsContainer.appendChild(bookElement);
-        });
-    }
-
     function toggleInterface() {
         const userInterface = document.getElementById("userInterface");
         const adminInterface = document.getElementById("adminInterface");
         userInterface.classList.toggle("hidden");
         adminInterface.classList.toggle("hidden");
+    }
+
+    function searchBooks(isAdmin = false) {
+        console.log("Search function called");
+        console.log("Current books in catalog:", books);
+        
+        const searchTerm = isAdmin ? document.getElementById("adminSearchInput").value : document.getElementById("userSearchInput").value;
+        const searchField = document.getElementById("userSearchField").value;
+        const practiceArea = document.getElementById("practiceAreaFilter").value;
+        const publicationYear = document.getElementById("publicationYearFilter").value;
+        const itemStatus = document.getElementById("itemStatusFilter").value;
+
+        showLoading(isAdmin);
+
+        setTimeout(() => {
+            let results = books.filter(book => {
+                let matchesSearch = true;
+                let matchesPracticeArea = true;
+                let matchesPublicationYear = true;
+                let matchesItemStatus = true;
+
+                if (searchTerm) {
+                    if (searchField === "all") {
+                        matchesSearch = Object.values(book).some(value => 
+                            value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+                        );
+                    } else {
+                        matchesSearch = book[searchField] && book[searchField].toString().toLowerCase().includes(searchTerm.toLowerCase());
+                    }
+                }
+
+                if (practiceArea) {
+                    matchesPracticeArea = book["Practice Area"] === practiceArea;
+                }
+
+                if (publicationYear) {
+                    matchesPublicationYear = book["Publication Year"] && book["Publication Year"].toString() === publicationYear;
+                }
+
+                if (itemStatus) {
+                    matchesItemStatus = book["Item Status"] === itemStatus;
+                }
+
+                return matchesSearch && matchesPracticeArea && matchesPublicationYear && matchesItemStatus;
+            });
+
+            const resultsContainer = isAdmin ? document.getElementById("adminResults") : document.getElementById("userResults");
+            resultsContainer.innerHTML = "";
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = "<p>No results found.</p>";
+            } else {
+                results.forEach((book, index) => {
+                    const bookElement = document.createElement("div");
+                    bookElement.className = "book-item glass";
+                    bookElement.innerHTML = `
+                        <h3>${book.Title || 'N/A'}</h3>
+                        <p><strong>Author:</strong> ${book.Author || 'N/A'}</p>
+                        <p><strong>Call Number:</strong> ${book["Call Number"] || 'N/A'}</p>
+                        <p><strong>Location:</strong> ${book["Collection Location"] || 'N/A'}</p>
+                        <p><strong>Status:</strong> ${book["Item Status"] || 'N/A'}</p>
+                        <p><strong>Practice Area:</strong> ${book["Practice Area"] || 'N/A'}</p>
+                        <p><strong>Publication Year:</strong> ${book["Publication Year"] || 'N/A'}</p>
+                        <p><strong>Copy:</strong> ${book.Copy || 'N/A'}</p>
+                    `;
+
+                    if (isAdmin) {
+                        const editButton = document.createElement("button");
+                        editButton.textContent = "Edit";
+                        editButton.onclick = () => editBook(index);
+                        bookElement.appendChild(editButton);
+
+                        const deleteButton = document.createElement("button");
+                        deleteButton.textContent = "Delete";
+                        deleteButton.onclick = () => deleteBook(index);
+                        bookElement.appendChild(deleteButton);
+                    }
+
+                    resultsContainer.appendChild(bookElement);
+                });
+            }
+
+            hideLoading(isAdmin);
+        }, 500); // Simulating a delay for the loading animation
     }
 
     function addBook(event) {
@@ -470,21 +432,20 @@
         books.push(newBook);
         alert("Book added successfully!");
         document.getElementById("addBookForm").reset();
-        searchBooks(true);
         updateFilterOptions();
     }
 
     function editBook(index) {
         editingIndex = index;
         const book = books[index];
-        document.getElementById("editTitleInput").value = book.Title;
-        document.getElementById("editAuthorInput").value = book.Author;
-        document.getElementById("editCallNumberInput").value = book["Call Number"];
-        document.getElementById("editLocationInput").value = book["Collection Location"];
-        document.getElementById("editStatusInput").value = book["Item Status"];
-        document.getElementById("editPracticeAreaInput").value = book["Practice Area"];
-        document.getElementById("editPublicationYearInput").value = book["Publication Year"];
-        document.getElementById("editCopyInput").value = book["Copy"];
+        document.getElementById("editTitleInput").value = book.Title || '';
+        document.getElementById("editAuthorInput").value = book.Author || '';
+        document.getElementById("editCallNumberInput").value = book["Call Number"] || '';
+        document.getElementById("editLocationInput").value = book["Collection Location"] || '';
+        document.getElementById("editStatusInput").value = book["Item Status"] || '';
+        document.getElementById("editPracticeAreaInput").value = book["Practice Area"] || '';
+        document.getElementById("editPublicationYearInput").value = book["Publication Year"] || '';
+        document.getElementById("editCopyInput").value = book.Copy || '';
         document.getElementById("editModal").style.display = "block";
     }
 
@@ -578,11 +539,11 @@
         publicationYearFilter.innerHTML = '<option value="">Years</option>';
 
         practiceAreas.forEach(area => {
-            practiceAreaFilter.innerHTML += `<option value="${area}">${area}</option>`;
+            if (area) practiceAreaFilter.innerHTML += `<option value="${area}">${area}</option>`;
         });
 
         publicationYears.forEach(year => {
-            publicationYearFilter.innerHTML += `<option value="${year}">${year}</option>`;
+            if (year) publicationYearFilter.innerHTML += `<option value="${year}">${year}</option>`;
         });
     }
 
