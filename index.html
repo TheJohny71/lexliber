@@ -43,9 +43,9 @@
     <i class="fas fa-cog gear-icon" id="adminIcon"></i>
     
     <div id="userInterface">
-        <input type="text" id="searchInput" placeholder="Enter search term...">
-        <button id="searchButton">Search</button>
-        <div id="results"></div>
+        <input type="text" id="userSearchInput" placeholder="Enter search term...">
+        <button id="userSearchButton">Search</button>
+        <div id="userResults"></div>
     </div>
 
     <div id="adminInterface" class="hidden">
@@ -63,6 +63,10 @@
         <input type="file" id="bulkUploadInput" accept=".xlsx,.xls,.csv">
         <button id="bulkUploadButton">Upload File</button>
         <div id="uploadFeedback"></div>
+        <h3>Manage Books</h3>
+        <input type="text" id="adminSearchInput" placeholder="Search books...">
+        <button id="adminSearchButton">Search</button>
+        <div id="adminResults"></div>
     </div>
 
     <div id="editModal" class="modal">
@@ -90,10 +94,12 @@
         { "Title": "Contract", "Author": "JD", "Call Number": "123", "Collection Location": "stack", "Item Status": "checked out", "Practice Area": "transactions" }
     ];
 
-    function searchBooks() {
+    function searchBooks(isAdmin = false) {
         console.log("Search function called");
-        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-        const resultsDiv = document.getElementById("results");
+        const searchTerm = isAdmin 
+            ? document.getElementById("adminSearchInput").value.toLowerCase()
+            : document.getElementById("userSearchInput").value.toLowerCase();
+        const resultsDiv = isAdmin ? document.getElementById("adminResults") : document.getElementById("userResults");
         resultsDiv.innerHTML = "";
 
         const filteredBooks = books.filter(book => 
@@ -114,9 +120,13 @@
                     <p>Collection Location: ${book["Collection Location"]}</p>
                     <p>Item Status: ${book["Item Status"]}</p>
                     <p>Practice Area: ${book["Practice Area"]}</p>
-                    <button onclick="editBook(${index})">Edit</button>
-                    <button onclick="deleteBook(${index})">Delete</button>
                 `;
+                if (isAdmin) {
+                    bookDiv.innerHTML += `
+                        <button onclick="editBook(${index})">Edit</button>
+                        <button onclick="deleteBook(${index})">Delete</button>
+                    `;
+                }
                 resultsDiv.appendChild(bookDiv);
             });
         }
@@ -153,6 +163,7 @@
         books.push(newBook);
         alert("Book added successfully!");
         document.getElementById("addBookForm").reset();
+        searchBooks(true); // Refresh the admin book list
     }
 
     function editBook(index) {
@@ -187,7 +198,7 @@
             
             modal.style.display = "none";
             alert("Book updated successfully!");
-            searchBooks(); // Refresh the search results
+            searchBooks(true); // Refresh the admin book list
         };
     }
 
@@ -195,7 +206,7 @@
         if (confirm("Are you sure you want to delete this book?")) {
             books.splice(index, 1);
             alert("Book deleted successfully!");
-            searchBooks(); // Refresh the search results
+            searchBooks(true); // Refresh the admin book list
         }
     }
 
@@ -210,18 +221,26 @@
 
     function init() {
         console.log("Initializing...");
-        const searchButton = document.getElementById("searchButton");
+        const userSearchButton = document.getElementById("userSearchButton");
+        const adminSearchButton = document.getElementById("adminSearchButton");
         const adminIcon = document.getElementById("adminIcon");
         const addBookForm = document.getElementById("addBookForm");
         const bulkUploadButton = document.getElementById("bulkUploadButton");
         const modal = document.getElementById("editModal");
         const closeButton = modal.querySelector(".close");
         
-        if (searchButton) {
-            searchButton.addEventListener("click", searchBooks);
-            console.log("Search button listener added");
+        if (userSearchButton) {
+            userSearchButton.addEventListener("click", () => searchBooks(false));
+            console.log("User search button listener added");
         } else {
-            console.error("Search button not found");
+            console.error("User search button not found");
+        }
+
+        if (adminSearchButton) {
+            adminSearchButton.addEventListener("click", () => searchBooks(true));
+            console.log("Admin search button listener added");
+        } else {
+            console.error("Admin search button not found");
         }
 
         if (adminIcon) {
