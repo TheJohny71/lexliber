@@ -85,10 +85,10 @@
         <input type="text" id="searchInput" placeholder="Enter search term...">
         <select id="searchType">
             <option value="all">All Fields</option>
-            <option value="title">Title</option>
-            <option value="author">Author</option>
-            <option value="callNumber">Call Number</option>
-            <option value="practiceArea">Practice Area</option>
+            <option value="Title">Title</option>
+            <option value="Author">Author</option>
+            <option value="Call Number">Call Number</option>
+            <option value="Practice Area">Practice Area</option>
         </select>
         <button id="searchButton">Search</button>
         <div id="results"></div>
@@ -123,28 +123,20 @@
                 }
                 books = await response.json();
                 console.log('Book data loaded successfully');
+                console.log('First book:', books[0]); // Add this line for debugging
             } catch (error) {
                 console.error('Error loading book data:', error);
             }
         }
-async function fetchBookData() {
-    try {
-        const response = await fetch('https://raw.githubusercontent.com/yourusername/yourrepository/main/Sheet1%20(2).json');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        books = await response.json();
-        console.log('Book data loaded successfully');
-        console.log('First book:', books[0]); // Add this line
-    } catch (error) {
-        console.error('Error loading book data:', error);
-    }
-}
+
         function searchBooks() {
             const searchTerm = document.getElementById("searchInput").value.toLowerCase();
             const searchType = document.getElementById("searchType").value;
             const resultsDiv = document.getElementById("results");
             resultsDiv.innerHTML = "";
+
+            console.log('Searching for:', searchTerm);
+            console.log('Search type:', searchType);
 
             const filteredBooks = books.filter(book => {
                 if (searchType === "all") {
@@ -152,12 +144,12 @@ async function fetchBookData() {
                         String(value).toLowerCase().includes(searchTerm)
                     );
                 } else {
-                    const field = searchType === "practiceArea" ? "Practice Area" : 
-                                  searchType === "callNumber" ? "Call Number" : 
-                                  searchType.charAt(0).toUpperCase() + searchType.slice(1);
-                    return String(book[field]).toLowerCase().includes(searchTerm);
+                    console.log('Searching in field:', searchType);
+                    return String(book[searchType]).toLowerCase().includes(searchTerm);
                 }
             });
+
+            console.log('Filtered books:', filteredBooks);
 
             if (filteredBooks.length === 0) {
                 resultsDiv.innerHTML = "<p>No results found.</p>";
@@ -203,4 +195,32 @@ async function fetchBookData() {
                 const worksheet = workbook.Sheets[firstSheetName];
                 const jsonData = XLSX.utils.sheet_to_json(worksheet);
                 books.push(...jsonData);
-                alert(`
+                alert(`${jsonData.length} books added successfully!`);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function toggleInterface() {
+            document.getElementById("userInterface").classList.toggle("hidden");
+            document.getElementById("adminInterface").classList.toggle("hidden");
+        }
+
+        async function init() {
+            await fetchBookData(); // Load book data before setting up event listeners
+            document.getElementById("searchButton").addEventListener("click", searchBooks);
+            document.getElementById("searchInput").addEventListener("keypress", function(e) {
+                if (e.key === "Enter") searchBooks();
+            });
+            document.getElementById("addBookForm").addEventListener("submit", addBook);
+            document.getElementById("adminIcon").addEventListener("click", toggleInterface);
+            document.getElementById("bulkUploadButton").addEventListener("click", bulkUpload);
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
