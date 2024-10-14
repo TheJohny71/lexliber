@@ -3,53 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexLiber - Updated Version</title>
+    <title>LexLiber</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --primary-green: #00a68e;
+            --charcoal: #000000;
+            --gray-1: #f7f7f7;
+            --white: #ffffff;
+            --black: #000000;
+            --violet: #7379b9;
+            --coral: #f27557;
+            --blue: #278bcb;
+            --gray-2: #c7c7c7;
+            --chartreuse: #cad23b;
+        }
         body {
             font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f7f7f7;
-        }
-        .logo {
-            max-width: 200px;
-            margin-bottom: 20px;
+            background-color: var(--gray-1);
+            color: var(--charcoal);
         }
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+        .logo {
+            max-width: 200px;
+        }
         .gear-icon {
             font-size: 24px;
-            color: #00a68e;
+            color: var(--primary-green);
             cursor: pointer;
         }
         .search-container, .admin-container {
-            background-color: #ffffff;
+            background-color: var(--white);
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 20px;
         }
         input, select, button {
-            margin: 10px;
+            margin: 10px 0;
             padding: 8px;
             font-size: 16px;
         }
         button {
-            background-color: #00a68e;
-            color: #ffffff;
+            background-color: var(--primary-green);
+            color: var(--white);
             border: none;
             cursor: pointer;
+            padding: 10px 15px;
+        }
+        button:hover {
+            background-color: #008c7a;
         }
         #results {
             margin-top: 20px;
         }
         .book-item {
-            background-color: #ffffff;
-            border: 1px solid #c7c7c7;
+            background-color: var(--white);
+            border: 1px solid var(--gray-2);
             padding: 15px;
             margin-bottom: 10px;
             border-radius: 4px;
@@ -152,8 +169,8 @@
             document.getElementById("addBookForm").reset();
         }
 
-        function bulkUpload(event) {
-            const file = event.target.files[0];
+        function bulkUpload() {
+            const file = document.getElementById("bulkUploadInput").files[0];
             const reader = new FileReader();
             reader.onload = function(e) {
                 const data = new Uint8Array(e.target.result);
@@ -179,7 +196,7 @@
             });
             document.getElementById("addBookForm").addEventListener("submit", addBook);
             document.getElementById("adminIcon").addEventListener("click", toggleInterface);
-            document.getElementById("bulkUploadInput").addEventListener("change", bulkUpload);
+            document.getElementById("bulkUploadButton").addEventListener("click", bulkUpload);
         }
 
         if (document.readyState === "loading") {
