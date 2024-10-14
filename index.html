@@ -85,13 +85,24 @@
         document.getElementById("adminInterface").classList.toggle("hidden");
     }
 
+    function isCallNumberUnique(callNumber) {
+        return !books.some(book => book["Call Number"] === callNumber);
+    }
+
     function addBook(event) {
         event.preventDefault();
         console.log("Add book function called");
+        const callNumber = document.getElementById("callNumberInput").value;
+        
+        if (!isCallNumberUnique(callNumber)) {
+            alert("Error: A book with this Call Number already exists. Please use a unique Call Number.");
+            return;
+        }
+        
         const newBook = {
             "Title": document.getElementById("titleInput").value,
             "Author": document.getElementById("authorInput").value,
-            "Call Number": document.getElementById("callNumberInput").value,
+            "Call Number": callNumber,
             "Collection Location": document.getElementById("locationInput").value,
             "Item Status": document.getElementById("statusInput").value,
             "Practice Area": document.getElementById("practiceAreaInput").value
@@ -139,7 +150,7 @@
 
     function validateBookData(book) {
         const requiredFields = ["Title", "Author", "Call Number", "Collection Location", "Item Status", "Practice Area"];
-        return requiredFields.every(field => book.hasOwnProperty(field) && book[field]);
+        return requiredFields.every(field => book.hasOwnProperty(field) && book[field]) && isCallNumberUnique(book["Call Number"]);
     }
 
     function init() {
