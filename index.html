@@ -161,4 +161,90 @@
                 const bookDiv = document.createElement("div");
                 bookDiv.className = "book-item";
                 bookDiv.innerHTML = `
-                    <h3>${book["
+                    <h3>${book["Title"]}</h3>
+                    <p>Author: ${book["Author"]}</p>
+                    <p>Call Number: ${book["Call Number"]}</p>
+                    <p>Collection Location: ${book["Collection Location"]}</p>
+                    <p>Item Status: ${book["Item Status"]}</p>
+                    <p>Practice Area: ${book["Practice Area"]}</p>
+                `;
+                resultsDiv.appendChild(bookDiv);
+            });
+        }
+    }
+
+    function toggleInterface() {
+        console.log("toggleInterface function called");
+        document.getElementById("userInterface").classList.toggle("hidden");
+        document.getElementById("adminInterface").classList.toggle("hidden");
+    }
+
+    function addBook(event) {
+        event.preventDefault();
+        console.log("addBook function called");
+        const newBook = {
+            "Title": document.getElementById("titleInput").value,
+            "Author": document.getElementById("authorInput").value,
+            "Call Number": document.getElementById("callNumberInput").value,
+            "Collection Location": document.getElementById("locationInput").value,
+            "Item Status": document.getElementById("statusInput").value,
+            "Practice Area": document.getElementById("practiceAreaInput").value
+        };
+        books.push(newBook);
+        console.log("New book added:", newBook);
+        alert("Book added successfully!");
+        document.getElementById("addBookForm").reset();
+    }
+
+    function bulkUpload() {
+        console.log("bulkUpload function called");
+        alert("Bulk upload functionality not implemented in this test version");
+    }
+
+    function init() {
+        console.log("Initializing...");
+        const searchButton = document.getElementById("searchButton");
+        const adminIcon = document.getElementById("adminIcon");
+        const addBookForm = document.getElementById("addBookForm");
+        const bulkUploadButton = document.getElementById("bulkUploadButton");
+        
+        if (searchButton) {
+            searchButton.addEventListener("click", function() {
+                console.log("Search button clicked");
+                searchBooks();
+            });
+        } else {
+            console.error("Search button not found");
+        }
+        
+        if (adminIcon) {
+            adminIcon.addEventListener("click", function() {
+                console.log("Admin icon clicked");
+                toggleInterface();
+            });
+        } else {
+            console.error("Admin icon not found");
+        }
+
+        if (addBookForm) {
+            addBookForm.addEventListener("submit", addBook);
+        } else {
+            console.error("Add book form not found");
+        }
+
+        if (bulkUploadButton) {
+            bulkUploadButton.addEventListener("click", bulkUpload);
+        } else {
+            console.error("Bulk upload button not found");
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM fully loaded");
+        init();
+    });
+
+    console.log("Script finished");
+    </script>
+</body>
+</html>
