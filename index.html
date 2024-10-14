@@ -3,51 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexLiber</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>LexLiber - Updated Version</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        :root {
-            --primary-green: #00a68e;
-            --charcoal: #000000;
-            --gray-1: #f7f7f7;
-            --white: #ffffff;
-            --black: #000000;
-            --violet: #7379b9;
-            --coral: #f27557;
-            --blue: #278bcb;
-            --gray-2: #c7c7c7;
-            --chartreuse: #cad23b;
-        }
         body {
-            font-family: 'Roboto', Arial, sans-serif;
-            max-width: 1200px;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: var(--gray-1);
-            color: var(--charcoal);
+            background-color: #f7f7f7;
         }
         .logo {
             max-width: 200px;
             margin-bottom: 20px;
         }
-        .nav-tabs {
+        .header {
             display: flex;
-            margin-bottom: 20px;
+            justify-content: space-between;
+            align-items: center;
         }
-        .nav-tab {
-            padding: 10px 20px;
-            background-color: var(--gray-2);
-            color: var(--charcoal);
-            text-decoration: none;
-            border-radius: 5px 5px 0 0;
-            margin-right: 5px;
-        }
-        .nav-tab.active {
-            background-color: var(--primary-green);
-            color: var(--white);
+        .gear-icon {
+            font-size: 24px;
+            color: #00a68e;
+            cursor: pointer;
         }
         .search-container, .admin-container {
-            background-color: var(--white);
+            background-color: #ffffff;
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -56,32 +37,22 @@
             margin: 10px;
             padding: 8px;
             font-size: 16px;
-            border: 1px solid var(--gray-2);
-            border-radius: 4px;
         }
         button {
-            background-color: var(--primary-green);
-            color: var(--white);
+            background-color: #00a68e;
+            color: #ffffff;
             border: none;
             cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #008c7a;
         }
         #results {
             margin-top: 20px;
         }
         .book-item {
-            background-color: var(--white);
-            border: 1px solid var(--gray-2);
+            background-color: #ffffff;
+            border: 1px solid #c7c7c7;
             padding: 15px;
             margin-bottom: 10px;
             border-radius: 4px;
-        }
-        .book-item h3 {
-            color: var(--primary-green);
-            margin-top: 0;
         }
         .hidden {
             display: none;
@@ -89,15 +60,18 @@
     </style>
 </head>
 <body>
-    <img src="lexliber-logo.png.jpg" alt="LexLiber Logo" class="logo">
-    <div class="nav-tabs">
-        <a href="#" class="nav-tab active" id="userTab">End User</a>
-        <a href="#" class="nav-tab" id="adminTab">Admin</a>
+    <div class="header">
+        <img src="lexliber-logo.png.jpg" alt="LexLiber Logo" class="logo">
+        <i class="fas fa-cog gear-icon" id="adminIcon"></i>
     </div>
     <div id="userInterface" class="search-container">
         <input type="text" id="searchInput" placeholder="Enter search term...">
-        <select id="practiceAreaSelect">
-            <option value="">All Practice Areas</option>
+        <select id="searchType">
+            <option value="all">All Fields</option>
+            <option value="title">Title</option>
+            <option value="author">Author</option>
+            <option value="callNumber">Call Number</option>
+            <option value="practiceArea">Practice Area</option>
         </select>
         <button id="searchButton">Search</button>
         <div id="results"></div>
@@ -113,36 +87,36 @@
             <input type="text" id="practiceAreaInput" placeholder="Practice Area" required>
             <button type="submit">Add Book</button>
         </form>
+        <hr>
+        <h3>Bulk Upload</h3>
+        <input type="file" id="bulkUploadInput" accept=".xlsx, .xls, .csv">
+        <button id="bulkUploadButton">Upload Excel File</button>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script>
         const books = [
             // Your existing book data here
         ];
 
-        function populatePracticeAreas() {
-            const practiceAreas = new Set(books.map(book => book["Practice Area"]));
-            const select = document.getElementById("practiceAreaSelect");
-            practiceAreas.forEach(area => {
-                const option = document.createElement("option");
-                option.value = area;
-                option.textContent = area;
-                select.appendChild(option);
-            });
-        }
-
         function searchBooks() {
             const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-            const practiceArea = document.getElementById("practiceAreaSelect").value;
+            const searchType = document.getElementById("searchType").value;
             const resultsDiv = document.getElementById("results");
             resultsDiv.innerHTML = "";
 
-            const filteredBooks = books.filter(book => 
-                (book["Title"].toLowerCase().includes(searchTerm) ||
-                book["Author"].toLowerCase().includes(searchTerm) ||
-                book["Call Number"].toLowerCase().includes(searchTerm)) &&
-                (practiceArea === "" || book["Practice Area"] === practiceArea)
-            );
+            const filteredBooks = books.filter(book => {
+                if (searchType === "all") {
+                    return Object.values(book).some(value => 
+                        value.toLowerCase().includes(searchTerm)
+                    );
+                } else {
+                    const field = searchType === "practiceArea" ? "Practice Area" : 
+                                  searchType === "callNumber" ? "Call Number" : 
+                                  searchType.charAt(0).toUpperCase() + searchType.slice(1);
+                    return book[field].toLowerCase().includes(searchTerm);
+                }
+            });
 
             filteredBooks.forEach(book => {
                 const bookDiv = document.createElement("div");
@@ -176,25 +150,36 @@
             books.push(newBook);
             alert("Book added successfully!");
             document.getElementById("addBookForm").reset();
-            populatePracticeAreas();
         }
 
-        function switchTab(tabId) {
-            document.getElementById("userInterface").classList.toggle("hidden", tabId !== "userTab");
-            document.getElementById("adminInterface").classList.toggle("hidden", tabId !== "adminTab");
-            document.getElementById("userTab").classList.toggle("active", tabId === "userTab");
-            document.getElementById("adminTab").classList.toggle("active", tabId === "adminTab");
+        function bulkUpload(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                books.push(...jsonData);
+                alert(`${jsonData.length} books added successfully!`);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function toggleInterface() {
+            document.getElementById("userInterface").classList.toggle("hidden");
+            document.getElementById("adminInterface").classList.toggle("hidden");
         }
 
         function init() {
-            populatePracticeAreas();
             document.getElementById("searchButton").addEventListener("click", searchBooks);
             document.getElementById("searchInput").addEventListener("keypress", function(e) {
                 if (e.key === "Enter") searchBooks();
             });
             document.getElementById("addBookForm").addEventListener("submit", addBook);
-            document.getElementById("userTab").addEventListener("click", () => switchTab("userTab"));
-            document.getElementById("adminTab").addEventListener("click", () => switchTab("adminTab"));
+            document.getElementById("adminIcon").addEventListener("click", toggleInterface);
+            document.getElementById("bulkUploadInput").addEventListener("change", bulkUpload);
         }
 
         if (document.readyState === "loading") {
