@@ -39,173 +39,14 @@
         <select id="practiceAreaSelect">
             <option value="">All Practice Areas</option>
         </select>
-        <button onclick="searchBooks()">Search</button>
+        <button id="searchButton">Search</button>
     </div>
     <div id="results"></div>
 
     <script>
         const books = [
-  {
-    "Title": "Fundamentals of Taxation 2023 Edition",
-    "Author": "Cruz, Ana / Deschamps, Michael / Niswander, Frederick / Prendergast, Debra / Schisler, Dan",
-    "Call Number": "KF 6369.8 .C78 2023",
-    "Collection Location": "Stacks",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Fundamentals of Federal Income Taxation",
-    "Author": "Freeland, James J. / Lathrope, Daniel J. / Lind, Stephen A. / Stephens, Richard B.",
-    "Call Number": "KF 6369 .F74 2018",
-    "Collection Location": "Stacks",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Federal Income Taxation",
-    "Author": "Bankman, Joseph / Shaviro, Daniel N. / Stark, Kirk J. / Kleinbard, Edward D.",
-    "Call Number": "KF 6369 .B36 2019",
-    "Collection Location": "Stacks",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Federal Income Taxation of Corporations and Stockholders in a Nutshell",
-    "Author": "Burke, Karen C.",
-    "Call Number": "KF 6464 .Z9 B87 2019",
-    "Collection Location": "Reserve",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Partnership Taxation",
-    "Author": "Willis, Arthur B. / Postlewaite, Philip F. / Alexander, Kandyce M. / Magee, Cassady V.",
-    "Call Number": "KF 6452 .W52 2017",
-    "Collection Location": "Stacks",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Federal Estate and Gift Taxation in a Nutshell",
-    "Author": "McNulty, John K. / Lathrope, Daniel J.",
-    "Call Number": "KF 6572 .Z9 M3 2020",
-    "Collection Location": "Reserve",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "International Taxation in a Nutshell",
-    "Author": "Doernberg, Richard L. / Ault, Hugh J. / Shay, Stephen E.",
-    "Call Number": "K 4505 .D64 2020",
-    "Collection Location": "Reserve",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Federal Tax Practice and Procedure",
-    "Author": "Watson, Camilla E. / Billman, Brookes D.",
-    "Call Number": "KF 6300 .W38 2021",
-    "Collection Location": "Stacks",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Federal Tax Research",
-    "Author": "Sawyers, Roby / Raabe, William A. / Whittenburg, Gerald E. / Gill, Steven",
-    "Call Number": "KF 6335 .S39 2021",
-    "Collection Location": "Stacks",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Tax Procedure and Tax Fraud in a Nutshell",
-    "Author": "Camilla E. Watson",
-    "Call Number": "KF 6300 .Z9 W38 2021",
-    "Collection Location": "Reserve",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Federal Income Taxation of Estates and Trusts",
-    "Author": "Ascher, Mark L. / Ferguson, M. Carr",
-    "Call Number": "KF 6443 .A93 2020",
-    "Collection Location": "Stacks",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Taxation of S Corporations in a Nutshell",
-    "Author": "Kahn, Douglas A. / Kahn, Jeffrey H.",
-    "Call Number": "KF 6491 .Z9 K34 2019",
-    "Collection Location": "Reserve",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Federal Tax Accounting",
-    "Author": "Gertzman, Stephen F.",
-    "Call Number": "KF 6320 .G47 2020",
-    "Collection Location": "Stacks",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Tax Planning for Closely Held Enterprises",
-    "Author": "Jones, Sally M. / Rhoades-Catanach, Shelley C.",
-    "Call Number": "KF 6491 .J66 2020",
-    "Collection Location": "Stacks",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Federal Taxation of Property Transactions",
-    "Author": "Bittker, Boris I. / Lokken, Lawrence / McMahon, Martin J.",
-    "Call Number": "KF 6380 .B57 2020",
-    "Collection Location": "Stacks",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Taxation of Nonprofit Organizations in a Nutshell",
-    "Author": "Fishman, James J. / Schwarz, Stephen",
-    "Call Number": "KF 6449 .Z9 F57 2021",
-    "Collection Location": "Reserve",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Federal Tax Policy",
-    "Author": "Pechman, Joseph A.",
-    "Call Number": "HJ 2381 .P4 2018",
-    "Collection Location": "Stacks",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Tax Policy in the Real World",
-    "Author": "Slemrod, Joel",
-    "Call Number": "HJ 2381 .T39 2019",
-    "Collection Location": "Stacks",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Federal Taxation of Intellectual Property Transfers",
-    "Author": "Maine, Jeffrey A. / Nguyen, Xuan-Thao",
-    "Call Number": "KF 6289 .M35 2020",
-    "Collection Location": "Stacks",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  },
-  {
-    "Title": "Tax Aspects of Buying and Selling a Business",
-    "Author": "Ginsburg, Martin D. / Levin, Jack S. / Rocap, Donald E.",
-    "Call Number": "KF 6491 .G56 2020",
-    "Collection Location": "Stacks",
-    "Item Status": "Available",
-    "Practice Area": "Tax Law"
-  }
-];
+            // ... (your book data here, same as before)
+        ];
 
         // Populate practice area dropdown
         function populatePracticeAreas() {
@@ -242,4 +83,32 @@
                     <p>Call Number: ${book["Call Number"]}</p>
                     <p>Collection Location: ${book["Collection Location"]}</p>
                     <p>Item Status: ${book["Item Status"]}</p>
-                    <p>Practice
+                    <p>Practice Area: ${book["Practice Area"]}</p>
+                `;
+                resultsDiv.appendChild(bookDiv);
+            });
+
+            if (filteredBooks.length === 0) {
+                resultsDiv.innerHTML = "<p>No results found.</p>";
+            }
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            populatePracticeAreas();
+            const searchButton = document.getElementById('searchButton');
+            if (searchButton) {
+                searchButton.addEventListener('click', searchBooks);
+            }
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchBooks();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
