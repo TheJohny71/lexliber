@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library Catalog</title>
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         table {
             border-collapse: collapse;
@@ -29,88 +26,85 @@
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <h1>Library Catalog</h1>
+    <input type="text" id="searchInput" placeholder="Search books...">
+    <div id="results"></div>
 
-    <script type="text/babel">
-        function LibraryCatalog() {
-            const [books, setBooks] = React.useState([]);
-            const [searchTerm, setSearchTerm] = React.useState('');
+    <script>
+        let books = [];
 
-            const loadData = async () => {
-                try {
-                    const response = await fetch('Sheet1.json');
-                    const data = await response.json();
-                    console.log('Loaded data:', data);
-                    console.log('Number of books loaded:', data.length);
-                    console.log('First book:', data[0]);
-                    setBooks(data);
-                } catch (error) {
-                    console.error('Error loading data:', error);
-                }
-            };
+        async function loadData() {
+            try {
+                const response = await fetch('Sheet1.json');
+                books = await response.json();
+                console.log('Loaded data:', books);
+                console.log('Number of books loaded:', books.length);
+                console.log('First book:', books[0]);
+                displayBooks(books);
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
 
-            React.useEffect(() => {
-                loadData();
-            }, []);
+        function displayBooks(booksToDisplay) {
+            const resultsDiv = document.getElementById('results');
+            if (booksToDisplay.length === 0) {
+                resultsDiv.innerHTML = '<p>No results found</p>';
+                return;
+            }
 
-            const handleSearch = (event) => {
-                setSearchTerm(event.target.value);
-            };
+            let tableHtml = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Call Number</th>
+                            <th>Status</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            booksToDisplay.forEach(book => {
+                tableHtml += `
+                    <tr>
+                        <td>${book.Title || ''}</td>
+                        <td>${book["Call No."] || ''}</td>
+                        <td>${book["Item Status"] || ''}</td>
+                        <td>${book["Collection Location"] || ''}</td>
+                    </tr>
+                `;
+            });
+
+            tableHtml += `
+                    </tbody>
+                </table>
+            `;
+
+            resultsDiv.innerHTML = tableHtml;
+        }
+
+        function searchBooks() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            console.log('Search term:', searchTerm);
 
             const filteredBooks = books.filter(book => {
-                console.log('Checking book:', book);
-                const searchLower = searchTerm.toLowerCase();
-                const titleMatch = book.Title && book.Title.toLowerCase().includes(searchLower);
-                const callNoMatch = book["Call No."] && book["Call No."].toLowerCase().includes(searchLower);
-                const statusMatch = book["Item Status"] && book["Item Status"].toLowerCase().includes(searchLower);
-                const locationMatch = book["Collection Location"] && book["Collection Location"].toLowerCase().includes(searchLower);
-                
-                console.log('Matches:', { titleMatch, callNoMatch, statusMatch, locationMatch });
+                const titleMatch = book.Title && book.Title.toLowerCase().includes(searchTerm);
+                const callNoMatch = book["Call No."] && book["Call No."].toLowerCase().includes(searchTerm);
+                const statusMatch = book["Item Status"] && book["Item Status"].toLowerCase().includes(searchTerm);
+                const locationMatch = book["Collection Location"] && book["Collection Location"].toLowerCase().includes(searchTerm);
                 
                 return titleMatch || callNoMatch || statusMatch || locationMatch;
             });
 
-            console.log('Search term:', searchTerm);
             console.log('Number of filtered books:', filteredBooks.length);
-
-            return (
-                <div>
-                    <h1>Library Catalog</h1>
-                    <input 
-                        type="text" 
-                        placeholder="Search books..." 
-                        value={searchTerm}
-                        onChange={handleSearch}
-                    />
-                    {filteredBooks.length > 0 ? (
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Call Number</th>
-                                    <th>Status</th>
-                                    <th>Location</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredBooks.map((book, index) => (
-                                    <tr key={index}>
-                                        <td>{book.Title}</td>
-                                        <td>{book["Call No."]}</td>
-                                        <td>{book["Item Status"]}</td>
-                                        <td>{book["Collection Location"]}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    ) : (
-                        <p>No results found for "{searchTerm}"</p>
-                    )}
-                </div>
-            );
+            displayBooks(filteredBooks);
         }
 
-        ReactDOM.render(<LibraryCatalog />, document.getElementById('root'));
+        document.getElementById('searchInput').addEventListener('input', searchBooks);
+
+        loadData();
     </script>
 </body>
 </html>
