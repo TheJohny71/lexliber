@@ -10,6 +10,7 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            text-align: center;
         }
         .logo {
             max-width: 200px;
@@ -19,23 +20,41 @@
             margin-bottom: 20px;
         }
         input, select, button {
-            margin-right: 10px;
-            padding: 5px;
+            margin: 10px;
+            padding: 8px;
+            font-size: 16px;
+        }
+        #searchInput {
+            width: 300px;
+        }
+        #practiceAreaSelect {
+            width: 200px;
+        }
+        #searchButton {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #searchButton:hover {
+            background-color: #45a049;
         }
         #results {
             margin-top: 20px;
+            text-align: left;
         }
         .book-item {
             border: 1px solid #ddd;
             padding: 10px;
             margin-bottom: 10px;
+            background-color: #f9f9f9;
         }
     </style>
 </head>
 <body>
     <img src="lexliber-logo.png.jpg" alt="LexLiber Logo" class="logo">
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search...">
+        <input type="text" id="searchInput" placeholder="Enter search term...">
         <select id="practiceAreaSelect">
             <option value="">All Practice Areas</option>
         </select>
@@ -43,6 +62,12 @@
     </div>
     <div id="results"></div>
 
+    <script>
+        // Your existing JavaScript code here
+        // Make sure to keep the books array and all the functions (populatePracticeAreas, searchBooks, etc.)
+    </script>
+</body>
+</html>
     <script>
         const books = [
             // ... (your book data here, same as before)
