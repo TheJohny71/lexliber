@@ -130,6 +130,7 @@
                 "Practice Area": "Criminal Law"
             }
         ];
+        console.log("Initial books data:", books);
 
         function searchBooks() {
             const searchTerm = document.getElementById("searchInput").value.toLowerCase();
@@ -139,15 +140,20 @@
 
             console.log('Searching for:', searchTerm);
             console.log('Search type:', searchType);
+            console.log('Current books data:', books);
 
             const filteredBooks = books.filter(book => {
                 if (searchType === "all") {
-                    return Object.values(book).some(value => 
-                        String(value).toLowerCase().includes(searchTerm)
-                    );
+                    return Object.values(book).some(value => {
+                        const result = String(value).toLowerCase().includes(searchTerm);
+                        console.log(`Checking ${value}: ${result}`);
+                        return result;
+                    });
                 } else {
                     console.log('Searching in field:', searchType);
-                    return String(book[searchType]).toLowerCase().includes(searchTerm);
+                    const result = String(book[searchType]).toLowerCase().includes(searchTerm);
+                    console.log(`Checking ${book[searchType]}: ${result}`);
+                    return result;
                 }
             });
 
@@ -176,49 +182,4 @@
             event.preventDefault();
             const newBook = {
                 "Title": document.getElementById("titleInput").value,
-                "Author": document.getElementById("authorInput").value,
-                "Call Number": document.getElementById("callNumberInput").value,
-                "Collection Location": document.getElementById("locationInput").value,
-                "Item Status": document.getElementById("statusInput").value,
-                "Practice Area": document.getElementById("practiceAreaInput").value
-            };
-            books.push(newBook);
-            alert("Book added successfully!");
-            document.getElementById("addBookForm").reset();
-        }
-
-        function bulkUpload() {
-            alert("Bulk upload functionality not implemented in this test version");
-        }
-
-        function toggleInterface() {
-            document.getElementById("userInterface").classList.toggle("hidden");
-            document.getElementById("adminInterface").classList.toggle("hidden");
-        }
-
-        function init() {
-            document.getElementById("searchButton").addEventListener("click", searchBooks);
-            document.getElementById("searchInput").addEventListener("keypress", function(e) {
-                if (e.key === "Enter") searchBooks();
-            });
-            document.getElementById("addBookForm").addEventListener("submit", addBook);
-            document.getElementById("adminIcon").addEventListener("click", toggleInterface);
-            document.getElementById("bulkUploadButton").addEventListener("click", bulkUpload);
-        }
-
-        // Use 'DOMContentLoaded' instead of 'load' event
-        document.addEventListener("DOMContentLoaded", init);
-
-        // Use 'visibilitychange' instead of 'unload'
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                // Page is hidden, perform any necessary cleanup
-                console.log('Page is hidden');
-            } else {
-                // Page is visible again
-                console.log('Page is visible');
-            }
-        });
-    </script>
-</body>
-</html>
+                "Author": document.getElementById("authorInput").value
