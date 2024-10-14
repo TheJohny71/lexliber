@@ -3,108 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library Catalog</title>
+    <title>LexLiber Catalog</title>
     <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        th, td {
+        #searchInput {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .book {
             border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            box-sizing: border-box;
+            padding: 10px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Library Catalog</h1>
+    <h1>LexLiber Catalog</h1>
     <input type="text" id="searchInput" placeholder="Search books...">
     <div id="results"></div>
 
     <script>
         let books = [];
 
-        async function loadData() {
+        async function loadBooks() {
             try {
                 const response = await fetch('Sheet1.json');
                 books = await response.json();
-                console.log('Loaded data:', books);
-                console.log('Number of books loaded:', books.length);
-                console.log('First book:', books[0]);
+                console.log('Books loaded:', books.length);
                 displayBooks(books);
             } catch (error) {
-                console.error('Error loading data:', error);
+                console.error('Error loading books:', error);
             }
         }
 
-        function displayBooks(booksToDisplay) {
+        function displayBooks(booksToShow) {
             const resultsDiv = document.getElementById('results');
-            if (booksToDisplay.length === 0) {
-                resultsDiv.innerHTML = '<p>No results found</p>';
-                return;
-            }
+            resultsDiv.innerHTML = '';
 
-            let tableHtml = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Call Number</th>
-                            <th>Status</th>
-                            <th>Location</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            booksToDisplay.forEach(book => {
-                tableHtml += `
-                    <tr>
-                        <td>${book.Title || ''}</td>
-                        <td>${book["Call No."] || ''}</td>
-                        <td>${book["Item Status"] || ''}</td>
-                        <td>${book["Collection Location"] || ''}</td>
-                    </tr>
+            booksToShow.forEach(book => {
+                const bookElement = document.createElement('div');
+                bookElement.className = 'book';
+                bookElement.innerHTML = `
+                    <h3>${book.Title || 'No Title'}</h3>
+                    <p>Call Number: ${book["Call No."] || 'N/A'}</p>
+                    <p>Status: ${book["Item Status"] || 'N/A'}</p>
+                    <p>Location: ${book["Collection Location"] || 'N/A'}</p>
                 `;
+                resultsDiv.appendChild(bookElement);
             });
-
-            tableHtml += `
-                    </tbody>
-                </table>
-            `;
-
-            resultsDiv.innerHTML = tableHtml;
         }
 
-        function searchBooks() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            console.log('Search term:', searchTerm);
-
-            const filteredBooks = books.filter(book => {
-                const titleMatch = book.Title && book.Title.toLowerCase().includes(searchTerm);
-                const callNoMatch = book["Call No."] && book["Call No."].toLowerCase().includes(searchTerm);
-                const statusMatch = book["Item Status"] && book["Item Status"].toLowerCase().includes(searchTerm);
-                const locationMatch = book["Collection Location"] && book["Collection Location"].toLowerCase().includes(searchTerm);
-                
-                return titleMatch || callNoMatch || statusMatch || locationMatch;
-            });
-
-            console.log('Number of filtered books:', filteredBooks.length);
+        function searchBooks(searchTerm) {
+            const filteredBooks = books.filter(book => 
+                Object.values(book).some(value => 
+                    value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
             displayBooks(filteredBooks);
         }
 
-        document.getElementById('searchInput').addEventListener('input', searchBooks);
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchBooks(e.target.value);
+        });
 
-        loadData();
+        loadBooks();
     </script>
 </body>
 </html>
